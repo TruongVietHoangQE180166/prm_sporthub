@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../view_models/team_view_model.dart';
+import '../../widgets/custom_confirmation_modal.dart';
 import 'create_match_screen.dart';
 import 'my_matches_screen.dart';
-import 'match_detail_screen.dart';
 
 class FindTeamScreen extends StatelessWidget {
   const FindTeamScreen({super.key});
@@ -36,9 +36,8 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
     // Fetch teams when screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
-      // Call fetchAllTeams with userId: null to let it retrieve userId from storage
-      // This will include teamJoinRequest data needed for checking user status
-      teamViewModel.fetchAllTeams();
+      // Call fetchAllTeams without userId to get all public teams
+      teamViewModel.fetchAllTeams(userId: 'public');
     });
   }
 
@@ -56,20 +55,10 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
     }
   }
 
-  // Function to get disabled button color based on user status
+  // Function to get disabled button color - now returns grey for all disabled states
   Color _getDisabledButtonColor(bool isOwner, bool isMember, bool hasPendingRequest, bool isTeamFull, bool isMatchEnded) {
-    if (isOwner) {
-      return Colors.orange; // Orange for owner
-    } else if (isMember) {
-      return Colors.red; // Red for member
-    } else if (hasPendingRequest) {
-      return Colors.orange; // Orange for pending request
-    } else if (isTeamFull) {
-      return Colors.grey; // Grey for full team
-    } else if (isMatchEnded) {
-      return Colors.red; // Red for ended match
-    }
-    return Colors.grey; // Default grey
+    // Return grey for all disabled button states as per user preference
+    return Colors.grey;
   }
 
   @override
@@ -287,15 +276,27 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
     final bool isMember = _currentUserId != null && 
         (team['members'] as List).any((member) => member['userId'] == _currentUserId);
     
-    // Check if current user has a pending join request
-    final bool hasPendingRequest = _currentUserId != null && 
-        (team['teamJoinRequest'] as List).any((request) => 
-            request['userId'] == _currentUserId && request['status'] == 'PENDING');
+    // Check for pending and rejected requests
+    bool hasPendingRequest = false;
+    bool hasRejectedRequest = false;
     
-    // Check if current user has a rejected request
-    final bool hasRejectedRequest = _currentUserId != null && 
-        (team['teamJoinRequest'] as List).any((request) => 
-            request['userId'] == _currentUserId && request['status'] == 'REJECTED');
+    if (_currentUserId != null) {
+      final List requests = team['teamJoinRequest'] as List;
+      
+      // Check for pending requests (priority)
+      hasPendingRequest = requests.any((request) => 
+          request is Map && 
+          request['userId'] == _currentUserId && 
+          request['status'] == 'PENDING');
+      
+      // Only check for rejected if no pending request exists
+      if (!hasPendingRequest) {
+        hasRejectedRequest = requests.any((request) => 
+            request is Map && 
+            request['userId'] == _currentUserId && 
+            request['status'] == 'REJECTED');
+      }
+    }
     
     // Determine team status for badge
     String statusText = '';
@@ -357,6 +358,10 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
         levelBgColor = Colors.red.withOpacity(0.1);
         break;
     }
+    
+    // Get contact information
+    final String phoneNumber = team['numberPhone'] ?? 'Chưa cung cấp';
+    final String facebookLink = team['linkFacebook'] ?? 'Chưa cung cấp';
     
     return Container(
       width: double.infinity,
@@ -647,45 +652,202 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 
-                // Action buttons
+                // Contact information
+                const Text(
+                  'Thông tin liên hệ:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                
+                // Phone number
                 Row(
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7FD957).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.phone,
+                        color: Color(0xFF7FD957),
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      phoneNumber,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                
+                // Facebook link
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7FD957).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.facebook,
+                        color: Color(0xFF7FD957),
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Navigate to match detail screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MatchDetailScreen(matchData: team),
-                            ),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF7FD957)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        facebookLink,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
                         ),
-                        child: const Text(
-                          'Xem chi tiết',
-                          style: TextStyle(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                
+                // Participants section title
+                const Text(
+                  'Người tham gia:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                
+                // Owner
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF7FD957).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7FD957),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.star,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${team['ownerName'] ?? 'Unknown'} (Người tổ chức)',
+                          style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: Color(0xFF7FD957),
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 8),
+                
+                // Other participants
+                if (team['members'] == null || (team['members'] as List).isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 12),
+                    child: const Text(
+                      'Chưa có người tham gia khác',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    children: (team['members'] as List).map<Widget>((member) {
+                      // Skip owner as they're displayed separately
+                      if (member is Map && member['userId'] == team['ownerId']) {
+                        return const SizedBox.shrink();
+                      }
+                      
+                      return Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.1),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.grey,
+                                size: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                member is Map ? (member['username'] ?? 'Người dùng') : 'Người dùng',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  
+                const SizedBox(height: 20),
+                
+                // Action buttons (only one button now)
+                Row(
+                  children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: (isOwner || isMember || hasPendingRequest || isTeamFull || isMatchEnded) && !hasRejectedRequest ? null : () {
-                          // TODO: Implement join team functionality
+                        onPressed: (isOwner || isMember || hasPendingRequest || isTeamFull || isMatchEnded) && !hasRejectedRequest ? null : () async {
+                          // Implement join team functionality
                           // Users with rejected requests can join as new users
+                          final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+                          await teamViewModel.requestJoinTeam(team['id']);
                         },
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.resolveWith<Color>(
@@ -705,21 +867,36 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                             const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
-                        child: Text(
-                          isOwner 
-                              ? 'Bạn là người tạo' 
-                              : (isMember 
-                                  ? 'Đã tham gia' 
-                                  : (hasPendingRequest 
-                                      ? 'Đang chờ xác nhận' 
-                                      : (isMatchEnded 
-                                          ? 'Đã kết thúc' 
-                                          : (isTeamFull ? 'Đã đầy' : 'Tham gia')))),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
+                        child: Consumer<TeamViewModel>(
+                          builder: (context, teamViewModel, child) {
+                            if (teamViewModel.isJoiningTeam && !isOwner && !isMember && !hasPendingRequest && !isTeamFull && !isMatchEnded) {
+                              return const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            }
+                            
+                            return Text(
+                              isOwner 
+                                  ? 'Bạn là người tạo' 
+                                  : (isMember 
+                                      ? 'Đã tham gia' 
+                                      : (hasPendingRequest 
+                                          ? 'Đang chờ xác nhận' 
+                                          : (isMatchEnded 
+                                              ? 'Đã kết thúc' 
+                                              : (isTeamFull ? 'Đã đầy' : 'Tham gia')))),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),

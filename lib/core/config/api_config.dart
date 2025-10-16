@@ -22,6 +22,9 @@ class ApiConfig {
   static const String orderCheckStatusEndpoint = '/api/orders/status';
   static const String getOrderUserEndpoint = '/api/orders/user';
   static const String getAllTeamEndpoint = '/api/team/all';
+  static const String requestTeamEndpoint = '/api/team-request/vcl';
+  static const String acceptOrRejectTeamRequestEndpoint = '/api/team-request/join-requests';
+  static const String kichOrLeftTeamEndpoint = '/api/team-request/{teamId}/members/{userId}';
 
   
   // Timeout configuration (in seconds)

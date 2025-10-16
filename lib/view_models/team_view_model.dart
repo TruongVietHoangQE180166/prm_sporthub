@@ -8,10 +8,14 @@ class TeamViewModel extends ChangeNotifier {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   
   bool _isLoading = false;
+  bool _isJoiningTeam = false;
+  bool _isProcessingRequest = false; // New flag for processing team requests
   String? _errorMessage;
   List<Team> _teams = [];
 
   bool get isLoading => _isLoading;
+  bool get isJoiningTeam => _isJoiningTeam;
+  bool get isProcessingRequest => _isProcessingRequest; // New getter
   String? get errorMessage {
     return _errorMessage;
   }
@@ -124,5 +128,174 @@ class TeamViewModel extends ChangeNotifier {
   Future<void> refresh({String? userId}) async {
     print('=== TeamViewModel.refresh ===');
     await fetchAllTeams(userId: userId);
+  }
+
+  Future<bool> requestJoinTeam(String teamId) async {
+    print('=== TeamViewModel.requestJoinTeam ===');
+    _isJoiningTeam = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Retrieve accessToken from secure storage
+      final accessToken = await _secureStorage.read(key: 'accessToken');
+      print('Access token: ${accessToken != null ? "Present" : "Missing"}');
+      
+      if (accessToken == null) {
+        _errorMessage = 'Người dùng chưa đăng nhập';
+        _isJoiningTeam = false;
+        notifyListeners();
+        print('Error: User not logged in');
+        return false;
+      }
+
+      final result = await _apiService.requestJoinTeam(accessToken, teamId);
+      
+      print('API Response: $result');
+      
+      if (result['success'] == true) {
+        _isJoiningTeam = false;
+        notifyListeners();
+        // Refresh the teams list after successful join request
+        await fetchAllTeams();
+        return true;
+      } else {
+        _errorMessage = result['message'] is Map<String, dynamic> 
+            ? (result['message'] as Map<String, dynamic>)['messageDetail'] as String? 
+            : result['message'] as String? ?? 'Yêu cầu tham gia đội nhóm thất bại';
+        print('API Error: $_errorMessage');
+        _isJoiningTeam = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e, stackTrace) {
+      print('Exception in requestJoinTeam: $e');
+      print('Stack trace: $stackTrace');
+      _errorMessage = 'Đã có lỗi xảy ra khi yêu cầu tham gia đội nhóm: $e';
+      _isJoiningTeam = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Accept or reject a team join request
+  ///
+  /// Parameters:
+  /// - teamJoinRequestId: ID of the join request to process
+  /// - status: Either 'APPROVED' or 'REJECTED'
+  ///
+  /// Returns true if the operation was successful, false otherwise
+  Future<bool> acceptOrRejectTeamRequest(String teamJoinRequestId, String status) async {
+    print('=== TeamViewModel.acceptOrRejectTeamRequest ===');
+    print('teamJoinRequestId: $teamJoinRequestId');
+    print('status: $status');
+    
+    _isProcessingRequest = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Retrieve accessToken from secure storage
+      final accessToken = await _secureStorage.read(key: 'accessToken');
+      print('Access token: ${accessToken != null ? "Present" : "Missing"}');
+      
+      if (accessToken == null) {
+        _errorMessage = 'Người dùng chưa đăng nhập';
+        _isProcessingRequest = false;
+        notifyListeners();
+        print('Error: User not logged in');
+        return false;
+      }
+
+      final result = await _apiService.acceptOrRejectTeamRequest(accessToken, teamJoinRequestId, status);
+      
+      print('API Response: $result');
+      
+      if (result['success'] == true) {
+        _isProcessingRequest = false;
+        notifyListeners();
+        // Refresh the teams list after successful processing
+        await fetchAllTeams();
+        return true;
+      } else {
+        _errorMessage = result['message'] is Map<String, dynamic> 
+            ? (result['message'] as Map<String, dynamic>)['messageDetail'] as String? 
+            : result['message'] as String? ?? 'Xử lý yêu cầu tham gia thất bại';
+        print('API Error: $_errorMessage');
+        _isProcessingRequest = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e, stackTrace) {
+      print('Exception in acceptOrRejectTeamRequest: $e');
+      print('Stack trace: $stackTrace');
+      _errorMessage = 'Đã có lỗi xảy ra khi xử lý yêu cầu tham gia: $e';
+      _isProcessingRequest = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Kick a user from a team or leave a team
+  ///
+  /// Parameters:
+  /// - teamId: ID of the team to kick/leave
+  /// - userId: ID of the user to kick or the user leaving
+  /// - isKick: true if kicking another user, false if leaving the team
+  ///
+  /// Returns true if the operation was successful, false otherwise
+  Future<bool> kichOrLeftTeam(String teamId, String userId, bool isKick) async {
+    print('=== TeamViewModel.kichOrLeftTeam ===');
+    print('teamId: $teamId');
+    print('userId: $userId');
+    print('isKick: $isKick');
+    
+    _isProcessingRequest = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Retrieve accessToken from secure storage
+      final accessToken = await _secureStorage.read(key: 'accessToken');
+      print('Access token: ${accessToken != null ? "Present" : "Missing"}');
+      
+      if (accessToken == null) {
+        _errorMessage = 'Người dùng chưa đăng nhập';
+        _isProcessingRequest = false;
+        notifyListeners();
+        print('Error: User not logged in');
+        return false;
+      }
+
+      final result = await _apiService.kichOrLeftTeam(accessToken, teamId, userId, isKick);
+      
+      print('API Response: $result');
+      
+      if (result['success'] == true) {
+        _isProcessingRequest = false;
+        notifyListeners();
+        // Refresh the teams list after successful operation
+        await fetchAllTeams();
+        return true;
+      } else {
+        _errorMessage = result['message'] is Map<String, dynamic> 
+            ? (result['message'] as Map<String, dynamic>)['messageDetail'] as String? 
+            : result['message'] as String? ?? 
+              (isKick ? 'Không thể xóa người dùng khỏi đội nhóm' : 'Không thể rời khỏi đội nhóm');
+        print('API Error: $_errorMessage');
+        _isProcessingRequest = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e, stackTrace) {
+      print('Exception in kichOrLeftTeam: $e');
+      print('Stack trace: $stackTrace');
+      _errorMessage = isKick 
+          ? 'Đã có lỗi xảy ra khi xóa người dùng khỏi đội nhóm: $e'
+          : 'Đã có lỗi xảy ra khi rời khỏi đội nhóm: $e';
+      _isProcessingRequest = false;
+      notifyListeners();
+      return false;
+    }
   }
 }

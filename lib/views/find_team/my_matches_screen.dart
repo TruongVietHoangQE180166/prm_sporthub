@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../view_models/team_view_model.dart';
-import 'my_match_detail_screen.dart';
+
+import '../../widgets/custom_confirmation_modal.dart';
 
 class MyMatchesScreen extends StatelessWidget {
   const MyMatchesScreen({super.key});
@@ -23,20 +24,37 @@ class MyMatchesScreenContent extends StatefulWidget {
   State<MyMatchesScreenContent> createState() => _MyMatchesScreenContentState();
 }
 
-class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
+class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
+    with WidgetsBindingObserver {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadCurrentUserId();
     // Fetch teams when screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
-      // Call fetchAllTeams with userId: null to let it retrieve userId from storage
+      // Call fetchAllTeams with userId to get user-specific teams
       teamViewModel.fetchAllTeams();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Refresh data when app resumes
+      final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+      teamViewModel.fetchAllTeams();
+    }
   }
 
   Future<void> _loadCurrentUserId() async {
@@ -53,15 +71,272 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
     }
   }
 
-  // Function to cancel join request
-  void _cancelJoinRequest() {
-    // TODO: Implement cancel join request functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Chức năng hủy yêu cầu tham gia sẽ được triển khai sau'),
-        backgroundColor: Colors.orange,
-      ),
+  // Function to show cancel request confirmation dialog
+  void _showCancelRequestConfirmation(Map<String, dynamic> match) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomConfirmationModal(
+          title: 'Xác nhận hủy yêu cầu',
+          message: 'Bạn có chắc chắn muốn hủy yêu cầu tham gia trận đấu này?',
+          confirmButtonText: 'Hủy yêu cầu',
+          confirmButtonColor: Colors.red,
+          icon: Icons.cancel,
+          iconColor: Colors.red,
+          onConfirm: () {
+            Navigator.of(context).pop(); // Close dialog
+            // Use the same approach as kick/leave functionality
+            _kickOrLeaveTeam(match['id'], _currentUserId ?? '', false, 'yêu cầu tham gia');
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Close dialog
+          },
+        );
+      },
     );
+  }
+
+  // Function to show cancel match confirmation dialog
+  void _showCancelMatchConfirmation(Map<String, dynamic> match) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomConfirmationModal(
+          title: 'Xác nhận hủy trận đấu',
+          message: 'Bạn có chắc chắn muốn hủy trận đấu "${match['nameMatch']}"? Hành động này không thể hoàn tác.',
+          confirmButtonText: 'Hủy trận đấu',
+          confirmButtonColor: Colors.red,
+          icon: Icons.cancel,
+          iconColor: Colors.red,
+          onConfirm: () {
+            Navigator.of(context).pop(); // Close dialog
+            // TODO: Implement actual cancel match functionality
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Chức năng hủy trận đấu sẽ được triển khai sau'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Close dialog
+          },
+        );
+      },
+    );
+  }
+
+  // Function to show kick confirmation dialog
+  void _showKickConfirmation(Map<String, dynamic> member, Map<String, dynamic> match) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomConfirmationModal(
+          title: 'Xác nhận loại bỏ thành viên',
+          message: 'Bạn có chắc chắn muốn loại ${member['username'] ?? 'người dùng'} khỏi trận đấu?',
+          confirmButtonText: 'Loại bỏ',
+          confirmButtonColor: Colors.red,
+          icon: Icons.delete,
+          iconColor: Colors.red,
+          onConfirm: () {
+            Navigator.of(context).pop(); // Close dialog
+            // Implement actual kick functionality using the new ViewModel method
+            _kickOrLeaveTeam(match['id'], member['userId'], true, member['username'] ?? 'người dùng');
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Close dialog
+          },
+        );
+      },
+    );
+  }
+
+  // Function to show leave match confirmation dialog
+  void _showLeaveMatchConfirmation(Map<String, dynamic> match) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomConfirmationModal(
+          title: 'Xác nhận rời khỏi trận đấu',
+          message: 'Bạn có chắc chắn muốn rời khỏi trận đấu "${match['nameMatch']}"?',
+          confirmButtonText: 'Rời khỏi',
+          confirmButtonColor: Colors.red,
+          icon: Icons.exit_to_app,
+          iconColor: Colors.red,
+          onConfirm: () {
+            Navigator.of(context).pop(); // Close dialog
+            // Implement actual leave match functionality using the new ViewModel method
+            _kickOrLeaveTeam(match['id'], _currentUserId ?? '', false, match['nameMatch']);
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Close dialog
+          },
+        );
+      },
+    );
+  }
+
+  // Function to show accept request confirmation dialog
+  void _showAcceptRequestConfirmation(Map<String, dynamic> request, Map<String, dynamic> match) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomConfirmationModal(
+          title: 'Xác nhận chấp nhận yêu cầu',
+          message: 'Bạn có chắc chắn muốn chấp nhận yêu cầu tham gia của ${request['username'] ?? 'người dùng'}?',
+          confirmButtonText: 'Chấp nhận',
+          confirmButtonColor: Colors.green,
+          icon: Icons.check,
+          iconColor: Colors.green,
+          onConfirm: () {
+            Navigator.of(context).pop(); // Close dialog
+            _processRequest(request, match, 'APPROVED');
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Close dialog
+          },
+        );
+      },
+    );
+  }
+
+  // Function to show reject request confirmation dialog
+  void _showRejectRequestConfirmation(Map<String, dynamic> request, Map<String, dynamic> match) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomConfirmationModal(
+          title: 'Xác nhận từ chối yêu cầu',
+          message: 'Bạn có chắc chắn muốn từ chối yêu cầu tham gia của ${request['username'] ?? 'người dùng'}?',
+          confirmButtonText: 'Từ chối',
+          confirmButtonColor: Colors.red,
+          icon: Icons.close,
+          iconColor: Colors.red,
+          onConfirm: () {
+            Navigator.of(context).pop(); // Close dialog
+            _processRequest(request, match, 'REJECTED');
+          },
+          onCancel: () {
+            Navigator.of(context).pop(); // Close dialog
+          },
+        );
+      },
+    );
+  }
+
+  // Generic function to process (accept/reject) a join request
+  void _processRequest(Map<String, dynamic> request, Map<String, dynamic> match, String status) {
+    final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+    
+    // Get the teamJoinRequestId from the request
+    final String teamJoinRequestId = request['id'] ?? '';
+    
+    if (teamJoinRequestId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Không tìm thấy ID yêu cầu'),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      return;
+    }
+    
+    // Call the view model method to process the request
+    teamViewModel.acceptOrRejectTeamRequest(teamJoinRequestId, status).then((success) {
+      if (context.mounted) {
+        if (success) {
+          // Show success message
+          final isApprove = status == 'APPROVED';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isApprove 
+                  ? 'Đã chấp nhận yêu cầu tham gia' 
+                  : 'Đã từ chối yêu cầu tham gia'),
+              backgroundColor: Colors.green.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          
+          // Refresh the teams list
+          teamViewModel.fetchAllTeams();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(teamViewModel.errorMessage ?? 
+                  (status == 'APPROVED' 
+                      ? 'Không thể chấp nhận yêu cầu tham gia' 
+                      : 'Không thể từ chối yêu cầu tham gia')),
+              backgroundColor: Colors.red.shade400,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  // Generic function to kick or leave a team
+  void _kickOrLeaveTeam(String teamId, String userId, bool isKick, String userName) {
+    final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+    
+    if (teamId.isEmpty || userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Không tìm thấy thông tin trận đấu hoặc người dùng'),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      return;
+    }
+    
+    // Call the view model method to kick or leave the team
+    teamViewModel.kichOrLeftTeam(teamId, userId, isKick).then((success) {
+      if (context.mounted) {
+        if (success) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isKick 
+                  ? 'Đã loại $userName khỏi trận đấu' 
+                  : 'Đã rời khỏi trận đấu'),
+              backgroundColor: Colors.green.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(teamViewModel.errorMessage ?? 
+                  (isKick 
+                      ? 'Không thể loại $userName khỏi trận đấu' 
+                      : 'Không thể rời khỏi trận đấu')),
+              backgroundColor: Colors.red.shade400,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+      }
+    });
   }
 
   @override
@@ -197,8 +472,27 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
                         team.teamJoinRequest.any((request) => 
                             request.userId == _currentUserId && request.status == 'PENDING');
                     
+                    // Check if current user has a rejected join request
+                    final bool hasRejectedRequest = _currentUserId != null && 
+                        team.teamJoinRequest.any((request) => 
+                            request.userId == _currentUserId && request.status == 'REJECTED');
+                    
                     // Show team if user is owner, member, or has pending request
-                    return isOwner || isMember || hasPendingRequest;
+                    // But don't show if they only have a rejected request (and no pending request)
+                    // This prioritizes PENDING requests over REJECTED ones
+                    if (isOwner || isMember) {
+                      // Owners and members always see the team
+                      return true;
+                    } else if (hasPendingRequest) {
+                      // Users with pending requests see the team
+                      return true;
+                    } else if (hasRejectedRequest && !hasPendingRequest) {
+                      // Users with only rejected requests (and no pending) don't see the team
+                      return false;
+                    } else {
+                      // Users with no relationship to the team don't see it
+                      return false;
+                    }
                   }).toList();
 
                   if (filteredTeams.isEmpty) {
@@ -295,6 +589,25 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
     final int currentPlayers = (match['members'] as List).length + 1; // +1 for owner
     final bool isTeamFull = currentPlayers >= match['maxPlayers'];
     
+    // Determine team status for badge
+    String statusText = '';
+    Color statusColor = Colors.grey;
+    Color statusBgColor = Colors.grey.withOpacity(0.1);
+    
+    if (isMatchEnded) {
+      statusText = 'Đã kết thúc';
+      statusColor = Colors.red;
+      statusBgColor = Colors.red.withOpacity(0.1);
+    } else if (isTeamFull) {
+      statusText = 'Đã đầy';
+      statusColor = Colors.orange;
+      statusBgColor = Colors.orange.withOpacity(0.1);
+    } else {
+      statusText = 'Đang tuyển';
+      statusColor = const Color(0xFF7FD957);
+      statusBgColor = const Color(0xFF7FD957).withOpacity(0.1);
+    }
+    
     // Check if current user is the owner
     final bool isOwner = _currentUserId != null && _currentUserId == match['ownerId'];
     
@@ -306,6 +619,11 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
     final bool hasPendingRequest = _currentUserId != null && 
         (match['teamJoinRequest'] as List).any((request) => 
             request['userId'] == _currentUserId && request['status'] == 'PENDING');
+    
+    // Check if current user has a rejected join request
+    final bool hasRejectedRequest = _currentUserId != null && 
+        (match['teamJoinRequest'] as List).any((request) => 
+            request['userId'] == _currentUserId && request['status'] == 'REJECTED');
     
     // Get sport icon
     IconData sportIcon = Icons.sports;
@@ -434,11 +752,11 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            isOwner ? 'Bạn là người tổ chức' : (hasPendingRequest ? 'Đang chờ xác nhận' : 'Bạn đã tham gia'),
+                            isOwner ? 'Bạn là người tổ chức' : (hasPendingRequest ? 'Đang chờ xác nhận' : (hasRejectedRequest ? 'Yêu cầu bị từ chối' : 'Bạn đã tham gia')),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: isOwner ? const Color(0xFF7FD957) : (hasPendingRequest ? Colors.orange : Colors.grey[600]),
+                              color: isOwner ? const Color(0xFF7FD957) : (hasPendingRequest ? Colors.orange : (hasRejectedRequest ? Colors.red : Colors.grey[600])),
                             ),
                           ),
                         ],
@@ -446,21 +764,44 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
                     ],
                   ),
                 ),
-                // Level badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: levelBgColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    levelText,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: levelColor,
+                // Badges column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Level badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: levelBgColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        levelText,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: levelColor,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    // Status badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: statusBgColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        statusText,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: statusColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -615,55 +956,382 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
                       ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                
+                // Contact information
+                const Text(
+                  'Thông tin liên hệ:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                
+                // Phone number
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7FD957).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.phone,
+                        color: Color(0xFF7FD957),
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      match['numberPhone'] ?? 'Chưa cung cấp',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                
+                // Facebook link
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7FD957).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.facebook,
+                        color: Color(0xFF7FD957),
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        match['linkFacebook'] ?? 'Chưa cung cấp',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                
+                // Participants section
+                const Text(
+                  'Người tham gia:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                
+                // Owner
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF7FD957).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7FD957),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.star,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${match['ownerName']} (Người tổ chức)',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF7FD957),
+                              ),
+                            ),
+                            // Show owner email if available
+                            if ((match['members'] as List).isNotEmpty && 
+                                (match['members'] as List).any((member) => 
+                                    member['userId'] == match['ownerId'] && 
+                                    member['email'] != null))
+                              Text(
+                                (match['members'] as List)
+                                    .firstWhere(
+                                      (member) => member['userId'] == match['ownerId'],
+                                      orElse: () => {'email': ''}
+                                    )['email'],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      // Show kick button for owners to remove themselves (transfer ownership)
+                      // Only show if there are other members
+                      if (isOwner && (match['members'] as List).length > 1)
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+                          onPressed: () {
+                            // TODO: Implement transfer ownership or leave functionality
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Chức năng rời khỏi trận sẽ được triển khai sau'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 6),
+                
+                // Other participants
+                if ((match['members'] as List).isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'Chưa có người tham gia khác',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    children: (match['members'] as List).map<Widget>((member) {
+                      // Skip owner as they're displayed separately
+                      if (member['userId'] == match['ownerId']) {
+                        return const SizedBox.shrink();
+                      }
+                      
+                      return Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.1),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.grey,
+                                size: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    member['username'] ?? 'Người dùng',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  if (member['email'] != null)
+                                    Text(
+                                      member['email'],
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            // Only show kick button for owners, and not for the owner themselves
+                            if (isOwner && member['userId'] != _currentUserId)
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+                                onPressed: () {
+                                  _showKickConfirmation(member, match);
+                                },
+                              ),
+                            // Show leave button for the current user if they are a member
+                            if (!isOwner && member['userId'] == _currentUserId)
+                              IconButton(
+                                icon: const Icon(Icons.exit_to_app, color: Colors.red, size: 18),
+                                onPressed: () {
+                                  _showLeaveMatchConfirmation(match);
+                                },
+                              ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                
+                const SizedBox(height: 20),
+                
+                // Team join requests section (only for owners)
+                if (isOwner && match['teamJoinRequest'] != null && (match['teamJoinRequest'] as List).isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Yêu cầu tham gia:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Column(
+                        children: (match['teamJoinRequest'] as List)
+                            .where((request) => request['status'] == 'PENDING') // Only show pending requests
+                            .map<Widget>((request) {
+                          return Container(
+                            margin: const EdgeInsets.only(top: 6),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.grey.withOpacity(0.1),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF7FD957).withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const Icon(
+                                    Icons.person_add,
+                                    color: Color(0xFF7FD957),
+                                    size: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        request['username'] ?? 'Người dùng',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Text(
+                                          'Chờ xác nhận',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Show leave button for the current user if they have a pending request
+                                if (request['userId'] == _currentUserId)
+                                  IconButton(
+                                    icon: const Icon(Icons.exit_to_app, color: Colors.red, size: 18),
+                                    onPressed: () {
+                                      _showLeaveMatchConfirmation(match);
+                                    },
+                                  ),
+                                // Action buttons for owner to accept/reject
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.check, color: Colors.green, size: 18),
+                                      onPressed: () {
+                                        _showAcceptRequestConfirmation(request, match);
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close, color: Colors.red, size: 18),
+                                      onPressed: () {
+                                        _showRejectRequestConfirmation(request, match);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                
                 const SizedBox(height: 20),
                 
                 // Action buttons
                 Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Navigate to match detail screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MyMatchDetailScreen(matchData: match),
-                            ),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF7FD957)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text(
-                          'Xem chi tiết',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF7FD957),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
                     if (isOwner)
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Implement edit match functionality
+                            _showCancelMatchConfirmation(match); // Use confirmation dialog
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
+                            backgroundColor: Colors.red,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                           child: const Text(
-                            'Chỉnh sửa',
+                            'Hủy trận đấu',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -675,7 +1343,9 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
                     else if (hasPendingRequest)
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _cancelJoinRequest,
+                          onPressed: () {
+                            _showCancelRequestConfirmation(match); // Pass match data
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             shape: RoundedRectangleBorder(
@@ -693,11 +1363,32 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent> {
                           ),
                         ),
                       )
+                    else if (hasRejectedRequest)
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: null, // Disabled for rejected requests
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text(
+                            'Yêu cầu bị từ chối',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
                     else
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Implement leave match functionality
+                            _showLeaveMatchConfirmation(match); // Use confirmation dialog
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
