@@ -186,7 +186,7 @@ class _UserInfoSectionState extends State<UserInfoSection> {
                     ? TextFormField(
                         controller: controller,
                         readOnly: onTap != null, // Make read-only if onTap is provided (for date picker)
-                        onTap: onTap != null ? () => onTap!(context) : null,
+                        onTap: onTap != null ? () => onTap(context) : null,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           border: const OutlineInputBorder(

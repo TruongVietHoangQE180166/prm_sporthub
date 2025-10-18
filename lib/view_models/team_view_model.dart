@@ -62,20 +62,12 @@ class TeamViewModel extends ChangeNotifier {
         if (finalUserId == null) {
           // Retrieve userId from secure storage
           finalUserId = await _secureStorage.read(key: 'userId');
-          print('User ID: ${finalUserId != null ? "Present" : "Missing"}');
-          
-          if (finalUserId == null) {
-            _errorMessage = 'Không tìm thấy thông tin người dùng';
-            _isLoading = false;
-            notifyListeners();
-            print('Error: User ID not found');
-            return false;
-          }
+          print('User ID: ${"Present"}');
         }
         
         result = await _apiService.getAllTeams(
           accessToken,
-          finalUserId,
+          finalUserId ?? '', // Provide empty string as default if null
           page: 1,
           size: 1000,
           field: 'createdDate',

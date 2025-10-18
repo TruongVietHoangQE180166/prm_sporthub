@@ -448,7 +448,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                     // Apply time filter
                     if (_selectedTimeFilter != null) {
                       filteredTeams = filteredTeams.where((team) {
-                        final DateTime matchTime = team.timeMatch as DateTime;
+                        final DateTime matchTime = team.timeMatch;
                         final DateTime now = DateTime.now();
                         
                         switch (_selectedTimeFilter) {
