@@ -133,7 +133,7 @@ class _ResetPasswordFormFieldsState extends State<ResetPasswordFormFields> {
               ),
               prefixIcon: Icon(
                 prefixIcon,
-                color: Colors.green.shade400,
+                color: const Color(0xFF7FD957),
                 size: 22,
               ),
               suffixIcon: suffixIcon,

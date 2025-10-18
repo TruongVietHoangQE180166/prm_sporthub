@@ -1554,4 +1554,149 @@ class ApiService {
       };
     }
   }
+
+  /// Delete a team
+  /// 
+  /// Parameters:
+  /// - accessToken: User's access token for authentication
+  /// - teamId: ID of the team to delete
+  ///
+  /// Returns a standard API response with success flag and message
+  Future<Map<String, dynamic>> deleteTeam(
+      String accessToken, String teamId) async {
+    print('=== ApiService.deleteTeam ===');
+    print('teamId: $teamId');
+    
+    try {
+      // Construct the URL with teamId in the path
+      final baseUrl = '${ApiConfig.baseUrl}${ApiConfig.deleteTeamEndpoint}'
+          .replaceAll('{teamId}', teamId);
+      
+      final uri = Uri.parse(baseUrl);
+      
+      print('API URL: $uri');
+
+      final response = await http.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response headers: ${response.headers}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print('Response data: $responseData');
+
+        // Handle the actual API response structure
+        if (responseData['success'] == true) {
+          return {
+            'success': true,
+            'message': responseData['message']?['messageDetail'] ?? 'Team has been deleted',
+            'data': responseData['data'],
+          };
+        } else {
+          print('API returned success=false');
+          print('Response data: $responseData');
+          return {
+            'success': false,
+            'message': responseData['message']?['messageDetail'] ?? 'Failed to delete team',
+          };
+        }
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return {
+          'success': false,
+          'message': 'Failed to delete team with status code: ${response.statusCode}',
+        };
+      }
+    } catch (error, stackTrace) {
+      print('Exception in deleteTeam: $error');
+      print('Stack trace: $stackTrace');
+      return {
+        'success': false,
+        'message': 'An error occurred while connecting to the server',
+      };
+    }
+  }
+
+  /// Create a new team
+  /// 
+  /// Parameters:
+  /// - accessToken: User's access token for authentication
+  /// - teamData: Map containing team information with keys:
+  ///   - nameMatch: String
+  ///   - descriptionMatch: String
+  ///   - nameSport: String
+  ///   - timeMatch: String (ISO 8601 format)
+  ///   - maxPlayers: int
+  ///   - location: String
+  ///   - level: String (LOW, MEDIUM, HIGH)
+  ///   - numberPhone: String
+  ///   - linkFacebook: String
+  ///
+  /// Returns a standard API response with success flag and message
+  Future<Map<String, dynamic>> createTeam(
+      String accessToken, Map<String, dynamic> teamData) async {
+    print('=== ApiService.createTeam ===');
+    print('teamData: $teamData');
+    
+    try {
+      final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.createTeamEndpoint}');
+      print('API URL: $url');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(teamData),
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response headers: ${response.headers}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        print('Response data: $responseData');
+
+        // Handle the actual API response structure
+        if (responseData['success'] == true) {
+          return {
+            'success': true,
+            'message': responseData['message']?['messageDetail'] ?? 'Team has been created',
+            'data': responseData['data'],
+          };
+        } else {
+          print('API returned success=false');
+          print('Response data: $responseData');
+          return {
+            'success': false,
+            'message': responseData['message']?['messageDetail'] ?? 'Failed to create team',
+          };
+        }
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return {
+          'success': false,
+          'message': 'Failed to create team with status code: ${response.statusCode}',
+        };
+      }
+    } catch (error, stackTrace) {
+      print('Exception in createTeam: $error');
+      print('Stack trace: $stackTrace');
+      return {
+        'success': false,
+        'message': 'An error occurred while connecting to the server',
+      };
+    }
+  }
 }

@@ -25,6 +25,8 @@ class ApiConfig {
   static const String requestTeamEndpoint = '/api/team-request/vcl';
   static const String acceptOrRejectTeamRequestEndpoint = '/api/team-request/join-requests';
   static const String kichOrLeftTeamEndpoint = '/api/team-request/{teamId}/members/{userId}';
+  static const String deleteTeamEndpoint = '/api/team-request/{teamId}';
+  static const String createTeamEndpoint = '/api/team';
 
   
   // Timeout configuration (in seconds)

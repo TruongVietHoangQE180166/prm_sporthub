@@ -222,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Thông tin đã được cập nhật thành công'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -333,7 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Mật khẩu đã được thay đổi thành công'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

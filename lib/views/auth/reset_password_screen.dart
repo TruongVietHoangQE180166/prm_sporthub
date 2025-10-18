@@ -6,6 +6,7 @@ import '../../widgets/reset_password_header.dart';
 import '../../widgets/reset_password_form_fields.dart';
 import '../../widgets/reset_password_footer.dart';
 import '../../widgets/resend_otp_section.dart';
+import '../../core/constants/colors.dart';
 
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -104,7 +105,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Đặt lại mật khẩu thành công!'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

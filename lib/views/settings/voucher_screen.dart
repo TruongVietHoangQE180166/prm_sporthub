@@ -141,7 +141,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result['message'] as String? ?? 'Đổi voucher thành công'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

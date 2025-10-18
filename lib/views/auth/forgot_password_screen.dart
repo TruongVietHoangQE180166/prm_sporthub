@@ -63,7 +63,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Liên kết đặt lại mật khẩu đã được gửi đến email của bạn'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

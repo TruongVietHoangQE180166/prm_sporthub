@@ -4,10 +4,12 @@ import '../home/home_screen.dart';
 import '../settings/settings_screen.dart';
 import '../find_team/find_team_screen.dart';
 import '../explore/explore_screen.dart';
-import '../booking/booking_screen.dart';
+import '../chat/booking_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int? initialTabIndex;
+
+  const MainScreen({super.key, this.initialTabIndex});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -21,6 +23,15 @@ class _MainScreenState extends State<MainScreen> {
     const BookingScreen(), // Changed from ExploreScreen to BookingScreen
     const SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial tab index if provided
+    if (widget.initialTabIndex != null) {
+      _currentIndex = widget.initialTabIndex!;
+    }
+  }
 
   DateTime? _currentBackPressTime;
 

@@ -298,4 +298,116 @@ class TeamViewModel extends ChangeNotifier {
       return false;
     }
   }
+
+  /// Delete a team
+  ///
+  /// Parameters:
+  /// - teamId: ID of the team to delete
+  ///
+  /// Returns true if the operation was successful, false otherwise
+  Future<bool> deleteTeam(String teamId) async {
+    print('=== TeamViewModel.deleteTeam ===');
+    print('teamId: $teamId');
+    
+    _isProcessingRequest = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Retrieve accessToken from secure storage
+      final accessToken = await _secureStorage.read(key: 'accessToken');
+      print('Access token: ${accessToken != null ? "Present" : "Missing"}');
+      
+      if (accessToken == null) {
+        _errorMessage = 'Người dùng chưa đăng nhập';
+        _isProcessingRequest = false;
+        notifyListeners();
+        print('Error: User not logged in');
+        return false;
+      }
+
+      final result = await _apiService.deleteTeam(accessToken, teamId);
+      
+      print('API Response: $result');
+      
+      if (result['success'] == true) {
+        _isProcessingRequest = false;
+        notifyListeners();
+        // Refresh the teams list after successful deletion
+        await fetchAllTeams();
+        return true;
+      } else {
+        _errorMessage = result['message'] is Map<String, dynamic> 
+            ? (result['message'] as Map<String, dynamic>)['messageDetail'] as String? 
+            : result['message'] as String? ?? 'Không thể xóa đội nhóm';
+        print('API Error: $_errorMessage');
+        _isProcessingRequest = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e, stackTrace) {
+      print('Exception in deleteTeam: $e');
+      print('Stack trace: $stackTrace');
+      _errorMessage = 'Đã có lỗi xảy ra khi xóa đội nhóm: $e';
+      _isProcessingRequest = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Create a new team
+  ///
+  /// Parameters:
+  /// - teamData: Map containing team information
+  ///
+  /// Returns true if the operation was successful, false otherwise
+  Future<bool> createTeam(Map<String, dynamic> teamData) async {
+    print('=== TeamViewModel.createTeam ===');
+    print('teamData: $teamData');
+    
+    _isProcessingRequest = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Retrieve accessToken from secure storage
+      final accessToken = await _secureStorage.read(key: 'accessToken');
+      print('Access token: ${accessToken != null ? "Present" : "Missing"}');
+      
+      if (accessToken == null) {
+        _errorMessage = 'Người dùng chưa đăng nhập';
+        _isProcessingRequest = false;
+        notifyListeners();
+        print('Error: User not logged in');
+        return false;
+      }
+
+      final result = await _apiService.createTeam(accessToken, teamData);
+      
+      print('API Response: $result');
+      
+      if (result['success'] == true) {
+        _isProcessingRequest = false;
+        notifyListeners();
+        // Refresh the teams list after successful creation
+        await fetchAllTeams();
+        return true;
+      } else {
+        _errorMessage = result['message'] is Map<String, dynamic> 
+            ? (result['message'] as Map<String, dynamic>)['messageDetail'] as String? 
+            : result['message'] as String? ?? 'Không thể tạo đội nhóm';
+        print('API Error: $_errorMessage');
+        _isProcessingRequest = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e, stackTrace) {
+      print('Exception in createTeam: $e');
+      print('Stack trace: $stackTrace');
+      _errorMessage = 'Đã có lỗi xảy ra khi tạo đội nhóm: $e';
+      _isProcessingRequest = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }
