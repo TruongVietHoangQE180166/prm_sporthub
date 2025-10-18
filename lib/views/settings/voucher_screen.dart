@@ -111,7 +111,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Center(
@@ -168,7 +168,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
     return ChangeNotifierProvider(
       create: (_) => VoucherViewModel(),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF121212) : const Color(0xFFF5F7FA),
         // Remove default AppBar and use custom header
         appBar: null, // Hide default app bar
         body: _isLoading
@@ -293,7 +293,7 @@ class VoucherCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -427,7 +427,9 @@ class VoucherCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: canExchange ? Colors.grey[800] : Colors.grey[500],
+                          color: canExchange
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey[800])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500]),
                         ),
                       ),
                     ],
@@ -446,7 +448,9 @@ class VoucherCard extends StatelessWidget {
                         'Tối thiểu ${voucher.minOrderText}đ',
                         style: TextStyle(
                           fontSize: 11,
-                          color: canExchange ? Colors.grey[600] : Colors.grey[400],
+                          color: canExchange
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400]),
                         ),
                       ),
                     ],
@@ -472,9 +476,9 @@ class VoucherCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: canExchange 
+                      color: canExchange
                           ? const Color(0xFF7FD957).withOpacity(0.1)
-                          : Colors.grey[100],
+                          : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100]),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -508,8 +512,8 @@ class VoucherCard extends StatelessWidget {
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: canExchange
-                                ? const Color(0xFF2D3436)
-                                : Colors.grey[500],
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2D3436))
+                                : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500]),
                           ),
                         ),
                         const SizedBox(width: 3),
@@ -517,7 +521,9 @@ class VoucherCard extends StatelessWidget {
                           'điểm',
                           style: TextStyle(
                             fontSize: 12,
-                            color: canExchange ? Colors.grey[600] : Colors.grey[400],
+                            color: canExchange
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600])
+                                : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400]),
                           ),
                         ),
                       ],
@@ -534,8 +540,8 @@ class VoucherCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7FD957),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey[300],
-                        disabledForegroundColor: Colors.grey[500],
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[300],
+                        disabledForegroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -586,7 +592,7 @@ class UserVoucherCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -632,7 +638,7 @@ class UserVoucherCard extends StatelessWidget {
                       Text(
                         '#${voucher.code}',
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -688,18 +694,21 @@ class UserVoucherCard extends StatelessWidget {
 
                   // Voucher details
                   _buildDetailRow(
+                    context: context,
                     icon: Icons.shopping_bag_outlined,
                     label: 'Đơn tối thiểu',
                     value: '${voucher.minOrderText}đ',
                   ),
                   const SizedBox(height: 8),
                   _buildDetailRow(
+                    context: context,
                     icon: Icons.calendar_today_outlined,
                     label: 'Ngày tạo',
                     value: '${voucher.createdDate.day}/${voucher.createdDate.month}/${voucher.createdDate.year}',
                   ),
                   const SizedBox(height: 8),
                   _buildDetailRow(
+                    context: context,
                     icon: Icons.stars_outlined,
                     label: 'Điểm quy đổi',
                     value: '${voucher.exchangePoint} điểm',
@@ -714,6 +723,7 @@ class UserVoucherCard extends StatelessWidget {
   }
 
   Widget _buildDetailRow({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required String value,
@@ -724,18 +734,18 @@ class UserVoucherCard extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            color: Colors.grey,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey,
           ),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF2D3436),
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : const Color(0xFF2D3436),
           ),
         ),
       ],

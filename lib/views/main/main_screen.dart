@@ -65,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           CustomPaint(
             size: Size(MediaQuery.of(context).size.width - 40, 75),
-            painter: BottomNavBarPainter(),
+            painter: BottomNavBarPainter(Theme.of(context).brightness == Brightness.dark),
           ),
           SizedBox(
             height: 75,
@@ -131,9 +131,9 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected 
+                  color: isSelected
                     ? const Color(0xFF7FD957)
-                    : Colors.black.withOpacity(0.5),
+                    : (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black.withOpacity(0.5)),
                   size: 32,
                 ),
               ),
@@ -141,9 +141,9 @@ class _MainScreenState extends State<MainScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected 
+                  color: isSelected
                     ? const Color(0xFF7FD957)
-                    : Colors.black.withOpacity(0.5),
+                    : (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black.withOpacity(0.5)),
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -214,14 +214,18 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class BottomNavBarPainter extends CustomPainter {
+  final bool isDarkMode;
+
+  BottomNavBarPainter(this.isDarkMode);
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white
       ..style = PaintingStyle.fill;
 
     final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.15)
+      ..color = isDarkMode ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.15)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
 
     final path = Path();

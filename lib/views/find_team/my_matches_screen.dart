@@ -399,7 +399,7 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: null, // Hide default app bar
       body: SafeArea(
         child: Column(
@@ -731,7 +731,7 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -789,10 +789,10 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                           Expanded(
                             child: Text(
                               match['nameMatch'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black87,
+                                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                                 letterSpacing: 0.2,
                               ),
                               maxLines: 1,
@@ -816,7 +816,13 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: isOwner ? const Color(0xFF7FD957) : (hasPendingRequest ? Colors.orange : (hasRejectedRequest ? Colors.red : Colors.grey[600])),
+                              color: isOwner
+                                ? const Color(0xFF7FD957)
+                                : (hasPendingRequest
+                                    ? Colors.orange
+                                    : (hasRejectedRequest
+                                        ? Colors.red
+                                        : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? Colors.grey[600])),
                             ),
                           ),
                         ],
@@ -892,9 +898,9 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                     Expanded(
                       child: Text(
                         match['location'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                     ),
@@ -1027,12 +1033,12 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Mô tả:',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -1040,7 +1046,7 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                           match['descriptionMatch'],
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[700],
+                            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? Colors.grey[700],
                           ),
                           // Apply truncation preference from memory
                           maxLines: isExpanded ? null : 4,

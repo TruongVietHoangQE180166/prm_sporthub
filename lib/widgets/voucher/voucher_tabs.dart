@@ -16,7 +16,7 @@ class VoucherTabs extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -47,7 +47,7 @@ class VoucherTabs extends StatelessWidget {
                       Icon(
                         Icons.card_giftcard,
                         size: 18,
-                        color: !showMyVouchers ? Colors.white : Colors.grey[600],
+                        color: !showMyVouchers ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -55,7 +55,7 @@ class VoucherTabs extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: !showMyVouchers ? Colors.white : Colors.grey[600],
+                          color: !showMyVouchers ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                         ),
                       ),
                     ],
@@ -82,7 +82,7 @@ class VoucherTabs extends StatelessWidget {
                       Icon(
                         Icons.wallet,
                         size: 18,
-                        color: showMyVouchers ? Colors.white : Colors.grey[600],
+                        color: showMyVouchers ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -90,7 +90,7 @@ class VoucherTabs extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: showMyVouchers ? Colors.white : Colors.grey[600],
+                          color: showMyVouchers ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                         ),
                       ),
                     ],
