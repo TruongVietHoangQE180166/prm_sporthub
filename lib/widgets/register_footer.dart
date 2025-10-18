@@ -61,7 +61,7 @@ class RegisterFooter extends StatelessWidget {
               child: Text(
                 'Đăng nhập',
                 style: TextStyle(
-                  color: Colors.green.shade600,
+                  color: const Color(0xFF7FD957),
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),

@@ -109,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản.'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

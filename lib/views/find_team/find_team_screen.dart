@@ -3,11 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../view_models/team_view_model.dart';
 import '../../widgets/custom_confirmation_modal.dart';
+import '../../models/team_model.dart';
 import 'create_match_screen.dart';
 import 'my_matches_screen.dart';
 
 class FindTeamScreen extends StatelessWidget {
   const FindTeamScreen({super.key});
+
+  static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +28,17 @@ class FindTeamScreenContent extends StatefulWidget {
   State<FindTeamScreenContent> createState() => _FindTeamScreenContentState();
 }
 
-class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
+class _FindTeamScreenContentState extends State<FindTeamScreenContent>
+    with WidgetsBindingObserver, RouteAware {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   String? _currentUserId;
+  String? _selectedLevelFilter;
+  String? _selectedTimeFilter;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadCurrentUserId();
     // Fetch teams when screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -39,6 +46,43 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
       // Call fetchAllTeams without userId to get all public teams
       teamViewModel.fetchAllTeams(userId: 'public');
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Refresh data when app resumes
+      _refreshData();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    FindTeamScreen.routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void disposeRoute() {
+    FindTeamScreen.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Refresh data when returning from other screens
+    _refreshData();
+  }
+
+  void _refreshData() {
+    final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+    teamViewModel.fetchAllTeams(userId: 'public');
   }
 
   Future<void> _loadCurrentUserId() async {
@@ -60,6 +104,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
     // Return grey for all disabled button states as per user preference
     return Colors.grey;
   }
+
+  // Add this new method to track expanded cards
+  final Set<String> _expandedCards = {};
 
   @override
   Widget build(BuildContext context) {
@@ -141,13 +188,21 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          // Get the TeamViewModel instance
+                          final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+                            
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const CreateMatchScreen(),
+                              builder: (context) => CreateMatchScreen(teamViewModel: teamViewModel),
                             ),
                           );
+                          // If result is true, it means a team was created successfully
+                          if (result == true) {
+                            // Refresh data after creating a team
+                            _refreshData();
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7FD957),
@@ -166,6 +221,167 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Filter section with level and time filters stacked vertically
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  // Level filter dropdown
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedLevelFilter,
+                        hint: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(Icons.signal_cellular_alt, color: Color(0xFF7FD957), size: 16),
+                              SizedBox(width: 8),
+                              Text(
+                                'Trình độ',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF7FD957),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        isExpanded: true,
+                        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF7FD957)),
+                        elevation: 16,
+                        style: const TextStyle(
+                          color: Color(0xFF7FD957),
+                          fontSize: 14,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedLevelFilter = newValue;
+                          });
+                        },
+                        items: <String?>[null, 'LOW', 'MEDIUM', 'HIGH']
+                            .map<DropdownMenuItem<String>>((String? value) {
+                          String displayText;
+                          if (value == null) {
+                            displayText = 'Tất cả trình độ';
+                          } else {
+                            switch (value) {
+                              case 'LOW':
+                                displayText = 'Mới chơi';
+                                break;
+                              case 'MEDIUM':
+                                displayText = 'Trung bình';
+                                break;
+                              case 'HIGH':
+                                displayText = 'Chuyên nghiệp';
+                                break;
+                              default:
+                                displayText = value;
+                            }
+                          }
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                displayText,
+                                style: const TextStyle(color: Color(0xFF7FD957)),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Time filter dropdown
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedTimeFilter,
+                        hint: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(Icons.access_time, color: Color(0xFF7FD957), size: 16),
+                              SizedBox(width: 8),
+                              Text(
+                                'Thời gian',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF7FD957),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        isExpanded: true,
+                        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF7FD957)),
+                        elevation: 16,
+                        style: const TextStyle(
+                          color: Color(0xFF7FD957),
+                          fontSize: 14,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedTimeFilter = newValue;
+                          });
+                        },
+                        items: <String?>[null, 'today', 'tomorrow', 'this_week', 'next_week', 'future']
+                            .map<DropdownMenuItem<String>>((String? value) {
+                          String displayText;
+                          if (value == null) {
+                            displayText = 'Tất cả thời gian';
+                          } else {
+                            switch (value) {
+                              case 'today':
+                                displayText = 'Hôm nay';
+                                break;
+                              case 'tomorrow':
+                                displayText = 'Ngày mai';
+                                break;
+                              case 'this_week':
+                                displayText = 'Tuần này';
+                                break;
+                              case 'next_week':
+                                displayText = 'Tuần sau';
+                                break;
+                              case 'future':
+                                displayText = 'Tương lai';
+                                break;
+                              default:
+                                displayText = value;
+                            }
+                          }
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                displayText,
+                                style: const TextStyle(color: Color(0xFF7FD957)),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ),
@@ -219,7 +435,51 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                       );
                     }
 
-                    if (teamViewModel.teams.isEmpty) {
+                    // Filter teams based on selected level and time
+                    List<Team> filteredTeams = teamViewModel.teams;
+                    
+                    // Apply level filter
+                    if (_selectedLevelFilter != null) {
+                      filteredTeams = filteredTeams
+                          .where((team) => team.level == _selectedLevelFilter)
+                          .toList();
+                    }
+                    
+                    // Apply time filter
+                    if (_selectedTimeFilter != null) {
+                      filteredTeams = filteredTeams.where((team) {
+                        final DateTime matchTime = team.timeMatch as DateTime;
+                        final DateTime now = DateTime.now();
+                        
+                        switch (_selectedTimeFilter) {
+                          case 'today':
+                            return matchTime.day == now.day && 
+                                   matchTime.month == now.month && 
+                                   matchTime.year == now.year;
+                          case 'tomorrow':
+                            final DateTime tomorrow = now.add(const Duration(days: 1));
+                            return matchTime.day == tomorrow.day && 
+                                   matchTime.month == tomorrow.month && 
+                                   matchTime.year == tomorrow.year;
+                          case 'this_week':
+                            final DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+                            final DateTime endOfWeek = startOfWeek.add(const Duration(days: 6));
+                            return matchTime.isAfter(startOfWeek.subtract(const Duration(days: 1))) && 
+                                   matchTime.isBefore(endOfWeek.add(const Duration(days: 1)));
+                          case 'next_week':
+                            final DateTime startOfNextWeek = now.subtract(Duration(days: now.weekday - 1)).add(const Duration(days: 7));
+                            final DateTime endOfNextWeek = startOfNextWeek.add(const Duration(days: 6));
+                            return matchTime.isAfter(startOfNextWeek.subtract(const Duration(days: 1))) && 
+                                   matchTime.isBefore(endOfNextWeek.add(const Duration(days: 1)));
+                          case 'future':
+                            return matchTime.isAfter(now);
+                          default:
+                            return true;
+                        }
+                      }).toList();
+                    }
+
+                    if (filteredTeams.isEmpty) {
                       return const Center(
                         child: Text(
                           'Không có đội bóng nào',
@@ -233,9 +493,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
 
                     return ListView.builder(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                      itemCount: teamViewModel.teams.length,
+                      itemCount: filteredTeams.length,
                       itemBuilder: (context, index) {
-                        final team = teamViewModel.teams[index];
+                        final team = filteredTeams[index];
                         // Convert Team model to Map for compatibility with existing _buildTeamCard
                         final teamMap = team.toJson();
                         return _buildTeamCard(context, teamMap);
@@ -359,9 +619,8 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
         break;
     }
     
-    // Get contact information
-    final String phoneNumber = team['numberPhone'] ?? 'Chưa cung cấp';
-    final String facebookLink = team['linkFacebook'] ?? 'Chưa cung cấp';
+    // Check if this card is expanded
+    final bool isExpanded = _expandedCards.contains(team['id']);
     
     return Container(
       width: double.infinity,
@@ -503,13 +762,13 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
             ),
           ),
           
-          // Team details
+          // Expandable content
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Description
+                // Description (always visible, but truncated)
                 if (team['descriptionMatch'] != null && team['descriptionMatch'].isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,14 +788,14 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                           fontSize: 14,
                           color: Colors.grey[700],
                         ),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: isExpanded ? null : 2, // Show all lines when expanded
+                        overflow: isExpanded ? null : TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 16),
                     ],
                   ),
                 
-                // Location and time
+                // Location and time (always visible)
                 Row(
                   children: [
                     Container(
@@ -609,7 +868,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                 ),
                 const SizedBox(height: 16),
                 
-                // Player count
+                // Player count (always visible)
                 Row(
                   children: [
                     Container(
@@ -652,190 +911,227 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 16),
                 
-                // Contact information
-                const Text(
-                  'Thông tin liên hệ:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                // Expand button
+                const SizedBox(height: 16),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (isExpanded) {
+                          _expandedCards.remove(team['id']);
+                        } else {
+                          _expandedCards.add(team['id']);
+                        }
+                      });
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isExpanded ? 'Ẩn bớt' : 'Xem thêm',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF7FD957),
+                          ),
+                        ),
+                        Icon(
+                          isExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: const Color(0xFF7FD957),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
                 
-                // Phone number
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7FD957).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(
-                        Icons.phone,
-                        color: Color(0xFF7FD957),
-                        size: 16,
-                      ),
+                // Expanded content (only visible when expanded)
+                if (isExpanded) ...[
+                  const SizedBox(height: 16),
+                  
+                  // Contact information
+                  const Text(
+                    'Thông tin liên hệ:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      phoneNumber,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Phone number
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7FD957).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(
+                          Icons.phone,
+                          color: Color(0xFF7FD957),
+                          size: 16,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                
-                // Facebook link
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7FD957).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(
-                        Icons.facebook,
-                        color: Color(0xFF7FD957),
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        facebookLink,
+                      const SizedBox(width: 8),
+                      Text(
+                        team['numberPhone'] ?? 'Chưa cung cấp',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                
-                // Participants section title
-                const Text(
-                  'Người tham gia:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    ],
                   ),
-                ),
-                const SizedBox(height: 8),
-                
-                // Owner
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF7FD957).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
+                  const SizedBox(height: 8),
+                  
+                  // Facebook link
+                  Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF7FD957),
-                          borderRadius: BorderRadius.circular(16),
+                          color: const Color(0xFF7FD957).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Icon(
-                          Icons.star,
-                          color: Colors.white,
-                          size: 14,
+                          Icons.facebook,
+                          color: Color(0xFF7FD957),
+                          size: 16,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${team['ownerName'] ?? 'Unknown'} (Người tổ chức)',
+                          team['linkFacebook'] ?? 'Chưa cung cấp',
                           style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF7FD957),
+                            color: Colors.black87,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Other participants
-                if (team['members'] == null || (team['members'] as List).isEmpty)
+                  const SizedBox(height: 16),
+                  
+                  // Participants section title
+                  const Text(
+                    'Người tham gia:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Owner
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: const Color(0xFF7FD957).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text(
-                      'Chưa có người tham gia khác',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
-                else
-                  Column(
-                    children: (team['members'] as List).map<Widget>((member) {
-                      // Skip owner as they're displayed separately
-                      if (member is Map && member['userId'] == team['ownerId']) {
-                        return const SizedBox.shrink();
-                      }
-                      
-                      return Container(
-                        margin: const EdgeInsets.only(top: 6),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.1),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF7FD957),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.star,
+                            color: Colors.white,
+                            size: 14,
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Icon(
-                                Icons.person,
-                                color: Colors.grey,
-                                size: 14,
-                              ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${team['ownerName'] ?? 'Unknown'} (Người tổ chức)',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF7FD957),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                member is Map ? (member['username'] ?? 'Người dùng') : 'Người dùng',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      );
-                    }).toList(),
+                      ],
+                    ),
                   ),
                   
+                  const SizedBox(height: 8),
+                  
+                  // Other participants
+                  if (team['members'] == null || (team['members'] as List).isEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        'Chưa có người tham gia khác',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    )
+                  else
+                    Column(
+                      children: (team['members'] as List).map<Widget>((member) {
+                        // Skip owner as they're displayed separately
+                        if (member is Map && member['userId'] == team['ownerId']) {
+                          return const SizedBox.shrink();
+                        }
+                        
+                        return Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.1),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: Colors.grey,
+                                  size: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  member is Map ? (member['username'] ?? 'Người dùng') : 'Người dùng',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                ],
+                
                 const SizedBox(height: 20),
                 
                 // Action buttons (only one button now)

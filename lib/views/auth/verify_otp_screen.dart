@@ -61,7 +61,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             content: Text(widget.isRegistration 
               ? 'Xác minh tài khoản thành công! Chào mừng bạn đến với SportHub' 
               : 'Xác minh OTP thành công!'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -100,7 +100,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         content: Text(widget.isRegistration
           ? 'Mã OTP mới đã được gửi đến email ${widget.email ?? 'của bạn'} để xác minh tài khoản'
           : 'Mã OTP mới đã được gửi đến email ${widget.email ?? 'của bạn'}'),
-        backgroundColor: Colors.green.shade600,
+        backgroundColor: const Color(0xFF7FD957),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

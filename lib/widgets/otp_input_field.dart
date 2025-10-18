@@ -105,7 +105,7 @@ class _OtpInputFieldState extends State<OtpInputField> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Colors.green.shade400,
+                  color: const Color(0xFF7FD957),
                   width: 2,
                 ),
               ),

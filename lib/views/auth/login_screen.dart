@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Đăng nhập thành công!'),
-              backgroundColor: Colors.green.shade600,
+              backgroundColor: const Color(0xFF7FD957),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

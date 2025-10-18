@@ -28,6 +28,8 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
     with WidgetsBindingObserver {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   String? _currentUserId;
+  // Set to track expanded state of match cards (similar to FindTeamScreen)
+  final Set<String> _expandedCards = {};
 
   @override
   void initState() {
@@ -71,6 +73,17 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
     }
   }
 
+  // Function to toggle expanded state of a match card (similar to FindTeamScreen)
+  void _toggleExpanded(String matchId) {
+    setState(() {
+      if (_expandedCards.contains(matchId)) {
+        _expandedCards.remove(matchId);
+      } else {
+        _expandedCards.add(matchId);
+      }
+    });
+  }
+
   // Function to show cancel request confirmation dialog
   void _showCancelRequestConfirmation(Map<String, dynamic> match) {
     showDialog(
@@ -110,13 +123,8 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
           iconColor: Colors.red,
           onConfirm: () {
             Navigator.of(context).pop(); // Close dialog
-            // TODO: Implement actual cancel match functionality
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Chức năng hủy trận đấu sẽ được triển khai sau'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            // Implement actual cancel match functionality using the new ViewModel method
+            _deleteTeam(match['id'], match['nameMatch']);
           },
           onCancel: () {
             Navigator.of(context).pop(); // Close dialog
@@ -256,7 +264,7 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
               content: Text(isApprove 
                   ? 'Đã chấp nhận yêu cầu tham gia' 
                   : 'Đã từ chối yêu cầu tham gia'),
-              backgroundColor: Colors.green.shade600,
+              backgroundColor: const Color(0xFF7FD957),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -313,7 +321,7 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
               content: Text(isKick 
                   ? 'Đã loại $userName khỏi trận đấu' 
                   : 'Đã rời khỏi trận đấu'),
-              backgroundColor: Colors.green.shade600,
+              backgroundColor: const Color(0xFF7FD957),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -327,6 +335,55 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                   (isKick 
                       ? 'Không thể loại $userName khỏi trận đấu' 
                       : 'Không thể rời khỏi trận đấu')),
+              backgroundColor: Colors.red.shade400,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  // Function to delete a team
+  void _deleteTeam(String teamId, String teamName) {
+    final teamViewModel = Provider.of<TeamViewModel>(context, listen: false);
+    
+    if (teamId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Không tìm thấy thông tin trận đấu'),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      return;
+    }
+    
+    // Call the view model method to delete the team
+    teamViewModel.deleteTeam(teamId).then((success) {
+      if (context.mounted) {
+        if (success) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Đã hủy trận đấu $teamName'),
+              backgroundColor: const Color(0xFF7FD957),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(teamViewModel.errorMessage ?? 'Không thể hủy trận đấu'),
               backgroundColor: Colors.red.shade400,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -667,6 +724,9 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
         break;
     }
     
+    // Check if this card is expanded (similar to FindTeamScreen)
+    final bool isExpanded = _expandedCards.contains(match['id']);
+    
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
@@ -807,40 +867,13 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
             ),
           ),
           
-          // Team details
+          // Team details - Collapsed view shows only essential information
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Description
-                if (match['descriptionMatch'] != null && match['descriptionMatch'].isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Mô tả:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        match['descriptionMatch'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                
-                // Location and time
+                // Location and time (always visible)
                 Row(
                   children: [
                     Container(
@@ -913,7 +946,7 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                 ),
                 const SizedBox(height: 16),
                 
-                // Player count
+                // Player count (always visible)
                 Row(
                   children: [
                     Container(
@@ -958,363 +991,421 @@ class _MyMatchesScreenContentState extends State<MyMatchesScreenContent>
                 ),
                 const SizedBox(height: 16),
                 
-                // Contact information
-                const Text(
-                  'Thông tin liên hệ:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                // Expand/Collapse button (similar to FindTeamScreen)
+                Center(
+                  child: GestureDetector(
+                    onTap: () => _toggleExpanded(match['id']),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isExpanded ? 'Ẩn bớt' : 'Xem thêm',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF7FD957),
+                          ),
+                        ),
+                        Icon(
+                          isExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: const Color(0xFF7FD957),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
                 
-                // Phone number
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7FD957).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(
-                        Icons.phone,
-                        color: Color(0xFF7FD957),
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      match['numberPhone'] ?? 'Chưa cung cấp',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
+                // Add extra spacing between expand button and expanded content or action buttons
+                const SizedBox(height: 20),
                 
-                // Facebook link
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7FD957).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(
-                        Icons.facebook,
-                        color: Color(0xFF7FD957),
-                        size: 16,
-                      ),
+                // Expanded content (only visible when expanded)
+                if (isExpanded) ...[
+                  const SizedBox(height: 16),
+                  
+                  // Description
+                  if (match['descriptionMatch'] != null && match['descriptionMatch'].isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Mô tả:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          match['descriptionMatch'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                          // Apply truncation preference from memory
+                          maxLines: isExpanded ? null : 4,
+                          overflow: isExpanded ? null : TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        match['linkFacebook'] ?? 'Chưa cung cấp',
+                  
+                  // Contact information
+                  const Text(
+                    'Thông tin liên hệ:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Phone number
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7FD957).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(
+                          Icons.phone,
+                          color: Color(0xFF7FD957),
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        match['numberPhone'] ?? 'Chưa cung cấp',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                
-                // Participants section
-                const Text(
-                  'Người tham gia:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    ],
                   ),
-                ),
-                const SizedBox(height: 8),
-                
-                // Owner
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF7FD957).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
+                  const SizedBox(height: 8),
+                  
+                  // Facebook link
+                  Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF7FD957),
-                          borderRadius: BorderRadius.circular(16),
+                          color: const Color(0xFF7FD957).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Icon(
-                          Icons.star,
-                          color: Colors.white,
-                          size: 14,
+                          Icons.facebook,
+                          color: Color(0xFF7FD957),
+                          size: 16,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${match['ownerName']} (Người tổ chức)',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF7FD957),
-                              ),
-                            ),
-                            // Show owner email if available
-                            if ((match['members'] as List).isNotEmpty && 
-                                (match['members'] as List).any((member) => 
-                                    member['userId'] == match['ownerId'] && 
-                                    member['email'] != null))
-                              Text(
-                                (match['members'] as List)
-                                    .firstWhere(
-                                      (member) => member['userId'] == match['ownerId'],
-                                      orElse: () => {'email': ''}
-                                    )['email'],
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                          ],
+                        child: Text(
+                          match['linkFacebook'] ?? 'Chưa cung cấp',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
-                      // Show kick button for owners to remove themselves (transfer ownership)
-                      // Only show if there are other members
-                      if (isOwner && (match['members'] as List).length > 1)
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red, size: 18),
-                          onPressed: () {
-                            // TODO: Implement transfer ownership or leave functionality
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Chức năng rời khỏi trận sẽ được triển khai sau'),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                          },
-                        ),
                     ],
                   ),
-                ),
-                
-                const SizedBox(height: 6),
-                
-                // Other participants
-                if ((match['members'] as List).isEmpty)
+                  const SizedBox(height: 16),
+                  
+                  // Participants section
+                  const Text(
+                    'Người tham gia:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Owner
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: const Color(0xFF7FD957).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text(
-                      'Chưa có người tham gia khác',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
-                else
-                  Column(
-                    children: (match['members'] as List).map<Widget>((member) {
-                      // Skip owner as they're displayed separately
-                      if (member['userId'] == match['ownerId']) {
-                        return const SizedBox.shrink();
-                      }
-                      
-                      return Container(
-                        margin: const EdgeInsets.only(top: 6),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.1),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF7FD957),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.star,
+                            color: Colors.white,
+                            size: 14,
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(16),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${match['ownerName']} (Người tổ chức)',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF7FD957),
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.person,
-                                color: Colors.grey,
-                                size: 14,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    member['username'] ?? 'Người dùng',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  if (member['email'] != null)
-                                    Text(
-                                      member['email'],
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            // Only show kick button for owners, and not for the owner themselves
-                            if (isOwner && member['userId'] != _currentUserId)
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red, size: 18),
-                                onPressed: () {
-                                  _showKickConfirmation(member, match);
-                                },
-                              ),
-                            // Show leave button for the current user if they are a member
-                            if (!isOwner && member['userId'] == _currentUserId)
-                              IconButton(
-                                icon: const Icon(Icons.exit_to_app, color: Colors.red, size: 18),
-                                onPressed: () {
-                                  _showLeaveMatchConfirmation(match);
-                                },
-                              ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                
-                const SizedBox(height: 20),
-                
-                // Team join requests section (only for owners)
-                if (isOwner && match['teamJoinRequest'] != null && (match['teamJoinRequest'] as List).isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Yêu cầu tham gia:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Column(
-                        children: (match['teamJoinRequest'] as List)
-                            .where((request) => request['status'] == 'PENDING') // Only show pending requests
-                            .map<Widget>((request) {
-                          return Container(
-                            margin: const EdgeInsets.only(top: 6),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.grey.withOpacity(0.1),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF7FD957).withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: const Icon(
-                                    Icons.person_add,
-                                    color: Color(0xFF7FD957),
-                                    size: 14,
+                              // Show owner email if available
+                              if ((match['members'] as List).isNotEmpty && 
+                                  (match['members'] as List).any((member) => 
+                                      member['userId'] == match['ownerId'] && 
+                                      member['email'] != null))
+                                Text(
+                                  (match['members'] as List)
+                                      .firstWhere(
+                                        (member) => member['userId'] == match['ownerId'],
+                                        orElse: () => {'email': ''}
+                                      )['email'],
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                            ],
+                          ),
+                        ),
+                        // Show kick button for owners to remove themselves (transfer ownership)
+                        // Only show if there are other members
+                        if (isOwner && (match['members'] as List).length > 1)
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+                            onPressed: () {
+                              // TODO: Implement transfer ownership or leave functionality
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Chức năng rời khỏi trận sẽ được triển khai sau'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 6),
+                  
+                  // Other participants
+                  if ((match['members'] as List).isEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        'Chưa có người tham gia khác',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    )
+                  else
+                    Column(
+                      children: (match['members'] as List).map<Widget>((member) {
+                        // Skip owner as they're displayed separately
+                        if (member['userId'] == match['ownerId']) {
+                          return const SizedBox.shrink();
+                        }
+                        
+                        return Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.1),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: Colors.grey,
+                                  size: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      member['username'] ?? 'Người dùng',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    if (member['email'] != null)
                                       Text(
-                                        request['username'] ?? 'Người dùng',
+                                        member['email'],
                                         style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.black87,
+                                          fontSize: 12,
+                                          color: Colors.grey,
                                         ),
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: Colors.orange.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: const Text(
-                                          'Chờ xác nhận',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.orange,
+                                  ],
+                                ),
+                              ),
+                              // Only show kick button for owners, and not for the owner themselves
+                              if (isOwner && member['userId'] != _currentUserId)
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+                                  onPressed: () {
+                                    _showKickConfirmation(member, match);
+                                  },
+                                ),
+                              // Show leave button for the current user if they are a member
+                              if (!isOwner && member['userId'] == _currentUserId)
+                                IconButton(
+                                  icon: const Icon(Icons.exit_to_app, color: Colors.red, size: 18),
+                                  onPressed: () {
+                                    _showLeaveMatchConfirmation(match);
+                                  },
+                                ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Team join requests section (only for owners)
+                  if (isOwner && match['teamJoinRequest'] != null && (match['teamJoinRequest'] as List).isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Yêu cầu tham gia:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: (match['teamJoinRequest'] as List)
+                              .where((request) => request['status'] == 'PENDING') // Only show pending requests
+                              .map<Widget>((request) {
+                            return Container(
+                              margin: const EdgeInsets.only(top: 6),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.grey.withOpacity(0.1),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF7FD957).withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Icon(
+                                      Icons.person_add,
+                                      color: Color(0xFF7FD957),
+                                      size: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          request['username'] ?? 'Người dùng',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.black87,
                                           ),
                                         ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Text(
+                                            'Chờ xác nhận',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.orange,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Show leave button for the current user if they have a pending request
+                                  if (request['userId'] == _currentUserId)
+                                    IconButton(
+                                      icon: const Icon(Icons.exit_to_app, color: Colors.red, size: 18),
+                                      onPressed: () {
+                                        _showLeaveMatchConfirmation(match);
+                                      },
+                                    ),
+                                  // Action buttons for owner to accept/reject
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.check, color: Colors.green, size: 18),
+                                        onPressed: () {
+                                          _showAcceptRequestConfirmation(request, match);
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close, color: Colors.red, size: 18),
+                                        onPressed: () {
+                                          _showRejectRequestConfirmation(request, match);
+                                        },
                                       ),
                                     ],
                                   ),
-                                ),
-                                // Show leave button for the current user if they have a pending request
-                                if (request['userId'] == _currentUserId)
-                                  IconButton(
-                                    icon: const Icon(Icons.exit_to_app, color: Colors.red, size: 18),
-                                    onPressed: () {
-                                      _showLeaveMatchConfirmation(match);
-                                    },
-                                  ),
-                                // Action buttons for owner to accept/reject
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.check, color: Colors.green, size: 18),
-                                      onPressed: () {
-                                        _showAcceptRequestConfirmation(request, match);
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.close, color: Colors.red, size: 18),
-                                      onPressed: () {
-                                        _showRejectRequestConfirmation(request, match);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  
+                  const SizedBox(height: 20),
+                ],
                 
-                const SizedBox(height: 20),
-                
-                // Action buttons
+                // Action buttons (always visible)
                 Row(
                   children: [
                     if (isOwner)

@@ -66,7 +66,7 @@ class _LoginFormFieldsState extends State<LoginFormFields> {
               );
             },
             style: TextButton.styleFrom(
-              foregroundColor: Colors.green.shade400,
+              foregroundColor: const Color(0xFF7FD957),
               padding: EdgeInsets.zero,
             ),
             child: Text(
@@ -74,7 +74,7 @@ class _LoginFormFieldsState extends State<LoginFormFields> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.green.shade600,
+                color: const Color(0xFF7FD957),
               ),
             ),
           ),
@@ -119,7 +119,7 @@ class _LoginFormFieldsState extends State<LoginFormFields> {
               ),
               prefixIcon: Icon(
                 prefixIcon,
-                color: Colors.green.shade400,
+                color: const Color(0xFF7FD957),
                 size: 22,
               ),
               suffixIcon: suffixIcon,

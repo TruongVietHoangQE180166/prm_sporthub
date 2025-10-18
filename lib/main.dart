@@ -6,10 +6,15 @@ import 'view_models/home_view_model.dart';
 import 'view_models/profile_view_model.dart';
 import 'view_models/voucher_view_model.dart';
 import 'view_models/order_view_model.dart';
+import 'view_models/field_view_model.dart';
+import 'view_models/team_view_model.dart';
 import 'views/auth/login_screen.dart';
 import 'views/main/main_screen.dart';
+import 'views/find_team/find_team_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -25,6 +30,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileViewModel()),
         ChangeNotifierProvider(create: (_) => VoucherViewModel()),
         ChangeNotifierProvider(create: (_) => OrderViewModel()),
+        ChangeNotifierProvider(create: (_) => FieldViewModel()),
+        ChangeNotifierProvider(create: (_) => TeamViewModel()),
       ],
       child: MaterialApp(
         title: 'Flutter MVVM',
@@ -33,6 +40,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           useMaterial3: true,
         ),
+        navigatorObservers: [FindTeamScreen.routeObserver],
         home: const AuthWrapper(),
       ),
     );

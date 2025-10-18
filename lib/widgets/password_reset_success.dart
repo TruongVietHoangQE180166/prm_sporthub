@@ -11,7 +11,7 @@ class PasswordResetSuccess extends StatelessWidget {
         Icon(
           Icons.check_circle,
           size: 80,
-          color: Colors.green.shade600,
+          color: const Color(0xFF7FD957),
         ),
         const SizedBox(height: 24),
         const Text(

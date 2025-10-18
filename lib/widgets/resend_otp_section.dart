@@ -73,7 +73,7 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Mã OTP mới đã được gửi đến email của bạn'),
-            backgroundColor: Colors.green.shade600,
+            backgroundColor: const Color(0xFF7FD957),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -125,7 +125,7 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: _isResendEnabled && !authViewModel.isLoading
-                    ? Colors.green.shade600 
+                    ? const Color(0xFF7FD957) 
                     : Colors.grey.shade400,
                 ),
               ),

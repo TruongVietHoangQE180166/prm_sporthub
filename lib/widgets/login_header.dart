@@ -18,7 +18,7 @@ class LoginHeader extends StatelessWidget {
             return Icon(
               Icons.sports_soccer,
               size: 80,
-              color: Colors.green.shade400,
+              color: const Color(0xFF7FD957),
             );
           },
         ),

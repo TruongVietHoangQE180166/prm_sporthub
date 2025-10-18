@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../view_models/team_view_model.dart';
+import '../../widgets/custom_confirmation_modal.dart';
 
 class CreateMatchScreen extends StatefulWidget {
-  const CreateMatchScreen({super.key});
+  final TeamViewModel? teamViewModel;
+
+  const CreateMatchScreen({super.key, this.teamViewModel});
 
   @override
   State<CreateMatchScreen> createState() => _CreateMatchScreenState();
@@ -706,30 +711,107 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
   // Function to submit form
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Prepare data
-      final Map<String, dynamic> matchData = {
-        'nameMatch': _nameMatchController.text,
-        'descriptionMatch': _descriptionMatchController.text,
-        'nameSport': _nameSportController.text,
-        'timeMatch': _timeMatchController.text,
-        'maxPlayers': int.parse(_maxPlayersController.text),
-        'location': _locationController.text,
-        'level': _selectedLevel,
-        'numberPhone': _numberPhoneController.text,
-        'linkFacebook': _linkFacebookController.text,
-      };
+      // Show confirmation dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustomConfirmationModal(
+            title: 'Xác nhận tạo trận đấu',
+            message: 'Bạn có chắc chắn muốn tạo trận đấu này không?',
+            onConfirm: () async {
+              Navigator.of(context).pop(); // Close the confirmation dialog
+              await _createTeam(); // Create the team
+            },
+            onCancel: () {
+              Navigator.of(context).pop(); // Close the confirmation dialog
+            },
+          );
+        },
+      );
+    }
+  }
+
+  // Function to create team
+  Future<void> _createTeam() async {
+    // Prepare data
+    final Map<String, dynamic> teamData = {
+      'nameMatch': _nameMatchController.text,
+      'descriptionMatch': _descriptionMatchController.text,
+      'nameSport': _nameSportController.text,
+      'timeMatch': _timeMatchController.text,
+      'maxPlayers': int.parse(_maxPlayersController.text),
+      'location': _locationController.text,
+      'level': _selectedLevel,
+      'numberPhone': _numberPhoneController.text,
+      'linkFacebook': _linkFacebookController.text,
+    };
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7FD957)),
+          ),
+        );
+      },
+    );
+
+    try {
+      // Get TeamViewModel instance - either from widget parameter or via Provider
+      final TeamViewModel teamViewModel = widget.teamViewModel ?? Provider.of<TeamViewModel>(context, listen: false);
       
-      // TODO: Send data to API
-      // For now, show a success message
+      // Call createTeam method
+      final success = await teamViewModel.createTeam(teamData);
+      
+      // Close loading indicator
+      Navigator.of(context).pop();
+      
+      if (success) {
+        // Show success message with the same style as MyMatchesScreen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Tạo trận đấu thành công!'),
+            backgroundColor: const Color(0xFF7FD957),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+        
+        // Return result to indicate success
+        Navigator.of(context).pop(true);
+      } else {
+        // Show error message with the same style as MyMatchesScreen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(teamViewModel.errorMessage ?? 'Có lỗi xảy ra khi tạo trận đấu'),
+            backgroundColor: Colors.red.shade400,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading indicator
+      Navigator.of(context).pop();
+      
+      // Show error message with the same style as MyMatchesScreen
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tạo trận đấu thành công!'),
-          backgroundColor: Color(0xFF7FD957),
+        SnackBar(
+          content: Text('Có lỗi xảy ra: $e'),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
-      
-      // Navigate back
-      Navigator.of(context).pop();
     }
   }
 }

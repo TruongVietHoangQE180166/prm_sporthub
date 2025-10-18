@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/payment_model.dart';
 import '../../view_models/order_status_view_model.dart';
 import '../custom_confirmation_dialog.dart';
+import '../../views/main/main_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final PaymentModel payment;
@@ -790,7 +791,16 @@ class _PaymentScreenState extends State<PaymentScreen> with SingleTickerProvider
           height: 56,
           child: ElevatedButton(
             onPressed: (_paymentCompleted || _paymentCancelled) 
-                ? widget.onBack 
+                ? () {
+                    // Navigate to Home Screen
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MainScreen(),
+                      ),
+                      (route) => route.isFirst,
+                    );
+                  }
                 : _cancelPayment,
             style: ElevatedButton.styleFrom(
               backgroundColor: (_paymentCompleted || _paymentCancelled)

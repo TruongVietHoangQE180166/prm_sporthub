@@ -63,7 +63,7 @@ class _ForgotPasswordFormFieldsState extends State<ForgotPasswordFormFields> {
               ),
               prefixIcon: Icon(
                 prefixIcon,
-                color: Colors.green.shade400,
+                color: const Color(0xFF7FD957),
                 size: 22,
               ),
               border: InputBorder.none,

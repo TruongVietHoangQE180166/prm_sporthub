@@ -14,6 +14,7 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   bool _isGridView = true;
   int _selectedSportIndex = 0;
+  bool _categorySelectedFromHome = false; // Flag to track if category was selected from home screen
   final TextEditingController _searchController = TextEditingController();
   RangeValues _priceRange = const RangeValues(0, 500000); // Default price range
   bool _showPriceFilter = false; // To toggle price filter visibility
@@ -37,6 +38,27 @@ class _ExploreScreenState extends State<ExploreScreen> {
     super.initState();
     // Add listener to search controller to trigger filtering when text changes
     _searchController.addListener(_onSearchChanged);
+    
+    // Check if a category was passed from the home screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final category = ModalRoute.of(context)?.settings.arguments as String?;
+      if (category != null) {
+        _selectCategoryByName(category);
+        setState(() {
+          _categorySelectedFromHome = true;
+        });
+      }
+    });
+  }
+  
+  // Method to select a category by name
+  void _selectCategoryByName(String categoryName) {
+    final index = _sports.indexWhere((sport) => sport['name'].toString().trim() == categoryName.toString().trim());
+    if (index != -1) {
+      setState(() {
+        _selectedSportIndex = index;
+      });
+    }
   }
 
   @override
@@ -58,7 +80,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
     List<FieldModel> filteredFields = List.from(allFields);
     
     // Apply sport filter first
-    if (_selectedSportIndex != 0) {
+    // Apply filtering if a specific category is selected (either from home screen or manually)
+    if (_selectedSportIndex > 0 || _categorySelectedFromHome) {
       // Get the selected sport name
       final selectedSport = _sports[_selectedSportIndex]['name'];
       
@@ -790,6 +813,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       onTap: () {
         setState(() {
           _selectedSportIndex = index;
+          _categorySelectedFromHome = false; // Reset the flag when user manually selects a category
         });
       },
       child: AnimatedContainer(
