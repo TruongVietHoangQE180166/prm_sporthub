@@ -127,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           borderRadius: BorderRadius.circular(12),
           child: const Icon(
-            Icons.arrow_back_rounded,
+            Icons.play_arrow_rounded,
             color: Colors.white,
             size: 20,
           ),
