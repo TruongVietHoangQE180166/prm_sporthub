@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../core/constants/colors.dart';
 
 class OnboardingViewModel extends ChangeNotifier {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  SharedPreferences? _prefs;
   
   bool _isLoading = false;
   bool _isOnboardingCompleted = false;
@@ -18,36 +17,36 @@ class OnboardingViewModel extends ChangeNotifier {
   PageController get pageController => _pageController;
   
   // Onboarding data
-  final List<OnboardingPageData> _pages = [
-    OnboardingPageData(
-      title: 'Chào mừng đến với\nSportHub',
-      description: 'Nền tảng đặt sân thể thao thông minh, kết nối cộng đồng yêu thể thao',
-      imagePath: 'assets/images/onboarding/welcome.png',
-      icon: Icons.sports_soccer_rounded,
-      backgroundColor: Color(0xFF7FD957),
-    ),
-    OnboardingPageData(
-      title: 'Đặt sân chỉ trong\nvài cú chạm',
-      description: 'Khám phá hàng trăm sân thể thao chất lượng, đặt lịch nhanh chóng, thanh toán tiện lợi',
-      imagePath: 'assets/images/onboarding/booking.png',
-      icon: Icons.calendar_today_rounded,
-      backgroundColor: Color(0xFF42A5F5),
-    ),
-    OnboardingPageData(
-      title: 'Tìm đồng đội,\ntạo trận đấu',
-      description: 'Kết nối với người chơi cùng đam mê, tham gia giải đấu, nâng cao kỹ năng',
-      imagePath: 'assets/images/onboarding/team.png',
-      icon: Icons.group_rounded,
-      backgroundColor: Color(0xFF7E57C2),
-    ),
-    OnboardingPageData(
-      title: 'Ưu đãi độc quyền\nđang chờ bạn',
-      description: 'Nhận voucher giảm giá, tích điểm thưởng, trải nghiệm sân VIP với giá ưu đãi',
-      imagePath: 'assets/images/onboarding/rewards.png',
-      icon: Icons.card_giftcard_rounded,
-      backgroundColor: Color(0xFFFF7043),
-    ),
-  ];
+   final List<OnboardingPageData> _pages = [
+     OnboardingPageData(
+       title: 'Chào mừng đến với\nSportHub',
+       description: 'Nền tảng đặt sân thể thao thông minh, kết nối cộng đồng yêu thể thao',
+       imagePath: 'assets/images/onboarding/welcome/Soccer-bro.png',
+       icon: Icons.sports_soccer_rounded,
+       backgroundColor: AppColors.primaryGreen,
+     ),
+     OnboardingPageData(
+       title: 'Đặt sân chỉ trong\nvài cú chạm',
+       description: 'Khám phá hàng trăm sân thể thao chất lượng, đặt lịch nhanh chóng, thanh toán tiện lợi',
+       imagePath: 'assets/images/onboarding/booking/Sport family-amico.png',
+       icon: Icons.calendar_today_rounded,
+       backgroundColor: AppColors.primaryGreen,
+     ),
+     OnboardingPageData(
+       title: 'Tìm đồng đội,\ntạo trận đấu',
+       description: 'Kết nối với người chơi cùng đam mê, tham gia giải đấu, nâng cao kỹ năng',
+       imagePath: 'assets/images/onboarding/team/Sitting volleyball-bro.png',
+       icon: Icons.group_rounded,
+       backgroundColor: AppColors.primaryGreen,
+     ),
+     OnboardingPageData(
+       title: 'Ưu đãi độc quyền\nđang chờ bạn',
+       description: 'Nhận voucher giảm giá, tích điểm thưởng, trải nghiệm sân VIP với giá ưu đãi',
+       imagePath: 'assets/images/onboarding/rewards/Tennis-bro.png',
+       icon: Icons.card_giftcard_rounded,
+       backgroundColor: AppColors.primaryGreen,
+     ),
+   ];
   
   List<OnboardingPageData> get pages => _pages;
   int get totalPages => _pages.length;
@@ -60,18 +59,13 @@ class OnboardingViewModel extends ChangeNotifier {
   Future<void> _initializeOnboarding() async {
     _isLoading = true;
     notifyListeners();
-    
+
     try {
-      _prefs = await SharedPreferences.getInstance();
-      _isOnboardingCompleted = _prefs?.getBool('onboarding_completed') ?? false;
-      
-      // Check if user is logged in
-      final userId = await _secureStorage.read(key: 'userId');
-      if (userId != null) {
-        _isOnboardingCompleted = true;
-      }
+      final onboardingCompleted = await _secureStorage.read(key: 'onboarding_completed');
+      _isOnboardingCompleted = onboardingCompleted == 'true';
     } catch (e) {
       print('Error initializing onboarding: $e');
+      _isOnboardingCompleted = false; // Default to showing onboarding if error
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -113,10 +107,10 @@ class OnboardingViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      
-      await _prefs?.setBool('onboarding_completed', true);
+
+      await _secureStorage.write(key: 'onboarding_completed', value: 'true');
       _isOnboardingCompleted = true;
-      
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -128,7 +122,7 @@ class OnboardingViewModel extends ChangeNotifier {
   
   Future<void> resetOnboarding() async {
     try {
-      await _prefs?.setBool('onboarding_completed', false);
+      await _secureStorage.delete(key: 'onboarding_completed');
       _isOnboardingCompleted = false;
       _currentPage = 0;
       _pageController.animateToPage(

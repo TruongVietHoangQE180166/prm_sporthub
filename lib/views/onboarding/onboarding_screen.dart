@@ -10,38 +10,23 @@ import '../auth/login_screen.dart';
 import '../auth/register_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final bool forceShow;
+
+  const OnboardingScreen({super.key, this.forceShow = false});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _backgroundController;
-  late Animation<double> _backgroundAnimation;
+class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void initState() {
     super.initState();
-    _setupBackgroundAnimation();
-  }
-
-  void _setupBackgroundAnimation() {
-    _backgroundController = AnimationController(
-      duration: Duration(seconds: 20),
-      vsync: this,
-    )..repeat();
-
-    _backgroundAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_backgroundController);
   }
 
   @override
   void dispose() {
-    _backgroundController.dispose();
     super.dispose();
   }
 
@@ -63,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             );
           }
 
-          if (viewModel.isOnboardingCompleted) {
+          if (viewModel.isOnboardingCompleted && !widget.forceShow) {
             return LoginScreen();
           }
 
@@ -98,7 +83,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           itemBuilder: (context, index) {
                             return OnboardingPageContent(
                               pageData: viewModel.pages[index],
-                              isVisible: index == viewModel.currentPage,
                             );
                           },
                         ),
@@ -118,17 +102,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Widget _buildAnimatedBackground() {
-    return AnimatedBuilder(
-      animation: _backgroundAnimation,
-      builder: (context, child) {
-        return Positioned.fill(
-          child: CustomPaint(
-            painter: OnboardingBackgroundPainter(
-              animationValue: _backgroundAnimation.value,
-            ),
-          ),
-        );
-      },
+    return Positioned.fill(
+      child: Container(
+        color: Colors.white, // Nền trắng giống UI chính
+        child: CustomPaint(
+          painter: OnboardingBackgroundPainter(),
+        ),
+      ),
     );
   }
 
@@ -240,62 +220,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 }
 
 class OnboardingBackgroundPainter extends CustomPainter {
-  final double animationValue;
-
-  OnboardingBackgroundPainter({required this.animationValue});
-
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Color(0xFF7FD957).withOpacity(0.03)
-      ..style = PaintingStyle.fill;
-
-    // Create floating circles
-    final circles = [
-      {'x': 0.1, 'y': 0.2, 'radius': 80.0, 'speed': 0.5},
-      {'x': 0.8, 'y': 0.1, 'radius': 60.0, 'speed': 0.7},
-      {'x': 0.3, 'y': 0.7, 'radius': 100.0, 'speed': 0.3},
-      {'x': 0.9, 'y': 0.8, 'radius': 70.0, 'speed': 0.6},
-      {'x': 0.5, 'y': 0.4, 'radius': 90.0, 'speed': 0.4},
-    ];
-
-    for (final circle in circles) {
-      final x = (circle['x'] as double) * size.width;
-      final y = (circle['y'] as double) * size.height;
-      final radius = circle['radius'] as double;
-      final speed = circle['speed'] as double;
-      
-      // Calculate position based on animation
-      final offset = (animationValue * speed * 2 * 3.14159) % (2 * 3.14159);
-      final offsetY = math.sin(offset) * 20;
-      final offsetX = math.cos(offset) * 15;
-      
-      canvas.drawCircle(
-        Offset(x + offsetX, y + offsetY),
-        radius,
-        paint,
-      );
-    }
-
-    // Create gradient overlay
-    final gradientPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Colors.transparent,
-          Color(0xFF7FD957).withOpacity(0.02),
-          Colors.transparent,
-        ],
-        stops: [0.0, 0.5, 1.0],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      gradientPaint,
-    );
+    // Nền trắng tinh - không có bất kỳ màu sắc nào khác
+    // Không vẽ gì cả để giữ nền trắng hoàn toàn
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+

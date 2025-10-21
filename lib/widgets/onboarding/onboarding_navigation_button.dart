@@ -31,13 +31,13 @@ class OnboardingNavigationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultBackgroundColor = isPrimary 
-        ? (backgroundColor ?? AppColors.primaryGreen)
+    final defaultBackgroundColor = isPrimary
+        ? (backgroundColor ?? AppColors.onboardingButton)
         : Colors.transparent;
     
     final defaultTextColor = isPrimary
         ? (textColor ?? Colors.white)
-        : (textColor ?? AppColors.primaryGreen);
+        : (textColor ?? AppColors.onboardingButton);
     
     final defaultBorderRadius = borderRadius ?? BorderRadius.circular(16);
     final defaultPadding = padding ?? EdgeInsets.symmetric(horizontal: 32, vertical: 16);
@@ -52,7 +52,7 @@ class OnboardingNavigationButton extends StatelessWidget {
               ? LinearGradient(
                   colors: [
                     defaultBackgroundColor,
-                    defaultBackgroundColor.withOpacity(0.85),
+                    AppColors.onboardingButtonHover,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -60,8 +60,11 @@ class OnboardingNavigationButton extends StatelessWidget {
               : null,
           color: isPrimary ? null : defaultBackgroundColor,
           borderRadius: defaultBorderRadius,
-          border: border ?? (isPrimary 
-              ? null 
+          border: border ?? (isPrimary
+              ? Border.all(
+                  color: Colors.white,
+                  width: 2.0,
+                )
               : Border.all(
                   color: defaultTextColor,
                   width: 1.5,
@@ -69,9 +72,10 @@ class OnboardingNavigationButton extends StatelessWidget {
           boxShadow: isPrimary
               ? [
                   BoxShadow(
-                    color: defaultBackgroundColor.withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: Offset(0, 6),
+                    color: AppColors.onboardingButton.withOpacity(0.5),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                    spreadRadius: 2,
                   ),
                 ]
               : null,
