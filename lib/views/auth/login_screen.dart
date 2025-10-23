@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../view_models/auth_view_model.dart';
+import '../../view_models/theme_view_model.dart';
 import '../../widgets/custom_button.dart';
 import '../main/main_screen.dart';
 import 'register_screen.dart';
@@ -108,7 +109,40 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(top: 40),
+        child: Consumer<ThemeViewModel>(
+          builder: (context, themeViewModel, child) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: () {
+                  themeViewModel.toggleTheme();
+                },
+                icon: Icon(
+                  themeViewModel.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+                tooltip: themeViewModel.isDarkMode
+                    ? 'Chuyển sang chế độ sáng'
+                    : 'Chuyển sang chế độ tối',
+              ),
+            );
+          },
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

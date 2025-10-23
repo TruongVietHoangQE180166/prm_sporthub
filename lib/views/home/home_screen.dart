@@ -695,7 +695,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final colors = [
       {'bg': const Color(0xFF7FD957), 'text': Colors.white},
       {'bg': Colors.grey.shade700, 'text': Colors.white},
-      {'bg': Colors.grey.shade900, 'text': Colors.white},
+      {'bg': Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade700
+          : Colors.grey.shade800, 'text': Colors.white},
       {'bg': Theme.of(context).brightness == Brightness.dark
           ? Colors.grey.shade600
           : Colors.grey.shade400,

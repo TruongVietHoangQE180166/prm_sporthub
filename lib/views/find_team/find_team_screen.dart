@@ -773,12 +773,12 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Mô tả:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? Colors.grey[600],
                         ),
                       ),
                       const SizedBox(height: 6),

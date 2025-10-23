@@ -520,7 +520,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập số điện thoại',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -575,7 +575,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập link Facebook',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,

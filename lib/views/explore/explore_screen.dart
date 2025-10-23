@@ -403,7 +403,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF2A2A2A)
+                                    : Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
@@ -416,12 +418,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Sắp xếp theo đánh giá',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.white70
+                                          : Colors.black87,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -456,14 +460,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
-                                            'Đánh giá cao nhất',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: _sortOption == 'rating_desc' 
-                                                  ? const Color(0xFF7FD957) 
-                                                  : Colors.black87,
-                                            ),
-                                          ),
+                                                    'Đánh giá cao nhất',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: _sortOption == 'rating_desc'
+                                                          ? const Color(0xFF7FD957)
+                                                          : (Theme.of(context).brightness == Brightness.dark
+                                                              ? Colors.white70
+                                                              : Colors.black87),
+                                                    ),
+                                                  ),
                                         ],
                                       ),
                                     ),
@@ -503,9 +509,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                             'Đánh giá thấp nhất',
                                             style: TextStyle(
                                               fontSize: 15,
-                                              color: _sortOption == 'rating_asc' 
-                                                  ? const Color(0xFF7FD957) 
-                                                  : Colors.black87,
+                                              color: _sortOption == 'rating_asc'
+                                                  ? const Color(0xFF7FD957)
+                                                  : (Theme.of(context).brightness == Brightness.dark
+                                                      ? Colors.white70
+                                                      : Colors.black87),
                                             ),
                                           ),
                                         ],
@@ -547,9 +555,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                             'Mặc định',
                                             style: TextStyle(
                                               fontSize: 15,
-                                              color: _sortOption == 'default' 
-                                                  ? const Color(0xFF7FD957) 
-                                                  : Colors.black87,
+                                              color: _sortOption == 'default'
+                                                  ? const Color(0xFF7FD957)
+                                                  : (Theme.of(context).brightness == Brightness.dark
+                                                      ? Colors.white70
+                                                      : Colors.black87),
                                             ),
                                           ),
                                         ],
@@ -569,7 +579,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF2A2A2A)
+                                    : Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
@@ -582,12 +594,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Lọc theo giá (VNĐ/giờ)',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.white70
+                                          : Colors.black87,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
@@ -613,16 +627,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                     children: [
                                       Text(
                                         'Từ: ${(_priceRange.start ~/ 1000)}K',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.grey,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.grey[400]
+                                              : Colors.grey,
                                         ),
                                       ),
                                       Text(
                                         'Đến: ${(_priceRange.end ~/ 1000)}K',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.grey,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.grey[400]
+                                              : Colors.grey,
                                         ),
                                       ),
                                     ],
@@ -822,7 +840,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
         decoration: BoxDecoration(
           color: isSelected
             ? Theme.of(context).cardColor
-            : Theme.of(context).cardColor.withOpacity(0.3),
+            : (Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF2A2A2A).withOpacity(0.6)
+                : Theme.of(context).cardColor.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(16),
           boxShadow: isSelected
               ? [
@@ -841,12 +861,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF7FD957) : Colors.white.withOpacity(0.5),
+                color: isSelected
+                  ? const Color(0xFF7FD957)
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.15)
+                      : Colors.white.withOpacity(0.5)),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isSelected ? Colors.white : Colors.black54,
+                color: isSelected
+                  ? Colors.white
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white70
+                      : Colors.black54),
                 size: 28,
               ),
             ),
@@ -856,7 +884,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.black87 : Colors.black54,
+                color: isSelected
+                  ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)
+                  : (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54),
               ),
               textAlign: TextAlign.center,
             ),

@@ -24,12 +24,12 @@ class LoginHeader extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // Title
-        const Text(
+        Text(
           'Chào mừng trở lại',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             letterSpacing: 0.5,
           ),
         ),
@@ -39,7 +39,7 @@ class LoginHeader extends StatelessWidget {
           'Đăng nhập để tiếp tục',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
             fontWeight: FontWeight.w400,
           ),
         ),

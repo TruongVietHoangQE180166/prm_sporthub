@@ -78,7 +78,15 @@ class LogoutButton extends StatelessWidget {
               'Đăng xuất',
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: const [
+                  Shadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                    color: Colors.black26,
+                  ),
+                ],
               ),
             ),
           ],
