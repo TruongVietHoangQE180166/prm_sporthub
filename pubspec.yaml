@@ -26,4 +26,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/onboarding/
+    - assets/images/onboarding/welcome/
+    - assets/images/onboarding/booking/
+    - assets/images/onboarding/team/
+    - assets/images/onboarding/rewards/
     - .env

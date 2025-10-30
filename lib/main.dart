@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'view_models/auth_view_model.dart';
 import 'view_models/home_view_model.dart';
 import 'view_models/profile_view_model.dart';
@@ -8,9 +9,11 @@ import 'view_models/voucher_view_model.dart';
 import 'view_models/order_view_model.dart';
 import 'view_models/field_view_model.dart';
 import 'view_models/team_view_model.dart';
+import 'view_models/onboarding_view_model.dart';
 import 'views/auth/login_screen.dart';
 import 'views/main/main_screen.dart';
 import 'views/find_team/find_team_screen.dart';
+import 'views/onboarding/onboarding_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
@@ -32,6 +35,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OrderViewModel()),
         ChangeNotifierProvider(create: (_) => FieldViewModel()),
         ChangeNotifierProvider(create: (_) => TeamViewModel()),
+        ChangeNotifierProvider(create: (_) => OnboardingViewModel()),
       ],
       child: MaterialApp(
         title: 'Flutter MVVM',
@@ -41,38 +45,45 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         navigatorObservers: [FindTeamScreen.routeObserver],
-        home: const AuthWrapper(),
+        home: const AppWrapper(),
       ),
     );
   }
 }
 
-class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
+class AppWrapper extends StatefulWidget {
+  const AppWrapper({super.key});
 
   @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
+  State<AppWrapper> createState() => _AppWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> {
+class _AppWrapperState extends State<AppWrapper> {
   late final FlutterSecureStorage _secureStorage;
+  late final SharedPreferences _prefs;
   bool _isLoading = true;
   bool _isLoggedIn = false;
+  bool _isOnboardingCompleted = false;
 
   @override
   void initState() {
     super.initState();
-    _secureStorage = const FlutterSecureStorage();
-    _checkLoginStatus();
+    _initializeApp();
   }
 
-  Future<void> _checkLoginStatus() async {
+  Future<void> _initializeApp() async {
     try {
+      _secureStorage = const FlutterSecureStorage();
+      _prefs = await SharedPreferences.getInstance();
+      
       // Check if user data exists in secure storage
       final userId = await _secureStorage.read(key: 'userId');
       final username = await _secureStorage.read(key: 'username');
       final email = await _secureStorage.read(key: 'email');
       final accessToken = await _secureStorage.read(key: 'accessToken');
+
+      // Check if onboarding is completed
+      _isOnboardingCompleted = _prefs.getBool('onboarding_completed') ?? false;
 
       setState(() {
         _isLoading = false;
@@ -91,7 +102,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            color: Color(0xFF7FD957),
+          ),
         ),
       );
     }
@@ -102,6 +115,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
         _initializeUserData(context);
       });
       return const MainScreen();
+    } else if (!_isOnboardingCompleted) {
+      return const OnboardingScreen();
     } else {
       return const LoginScreen();
     }

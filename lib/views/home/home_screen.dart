@@ -168,24 +168,36 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                       : CustomScrollView(
-                          slivers: [
-                            SliverToBoxAdapter(child: _buildAppBar()),
-                            SliverToBoxAdapter(child: _buildSearchSection()),
-                            SliverToBoxAdapter(child: _buildCategorySection()),
-                            SliverToBoxAdapter(child: _buildPromoCarousel()),
-                            SliverToBoxAdapter(child: _buildQuickActions()),
-                            SliverToBoxAdapter(child: _buildSectionHeader('Sân gần bạn')),
-                            SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) => _buildFieldCardFromModel(displayFields[index]),
-                                  childCount: displayFields.length,
-                                ),
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                        slivers: [
+                          SliverToBoxAdapter(child: _buildAppBar()),
+                          SliverToBoxAdapter(child: _buildSearchSection()),
+                          SliverToBoxAdapter(child: _buildCategorySection()),
+                          SliverToBoxAdapter(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: 220, // Giới hạn chiều cao tối đa cho carousel
+                              ),
+                              child: _buildPromoCarousel(),
+                            ),
+                          ),
+                          SliverToBoxAdapter(child: _buildQuickActions()),
+                          SliverToBoxAdapter(child: _buildSectionHeader('Sân gần bạn')),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  print('DEBUG: Building field card for index $index, total fields: ${displayFields.length}');
+                                  return _buildFieldCardFromModel(displayFields[index]);
+                                },
+                                childCount: displayFields.length,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
             ),
             bottomNavigationBar: null,
           );

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../view_models/auth_view_model.dart';
 import '../../widgets/custom_button.dart';
 import '../main/main_screen.dart';
+import '../onboarding/onboarding_screen.dart';
 import 'register_screen.dart';
 import '../../widgets/login_header.dart';
 import '../../widgets/login_form_fields.dart';
@@ -91,6 +92,50 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Widget _buildBackButton() {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF7FD957), Color(0xFF5FB833)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white,
+          width: 2.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7FD957).withOpacity(0.5),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            if (mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const OnboardingScreen(forceShow: true)),
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: const Icon(
+            Icons.play_arrow_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _handleGoogleSignIn() async {
     // TODO: Implement Google Sign In
     ScaffoldMessenger.of(context).showSnackBar(
@@ -110,52 +155,64 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  // Header with logo and title
-                  const LoginHeader(),
-                  const SizedBox(height: 50),
-                  // Form fields
-                  LoginFormFields(
-                    usernameController: _usernameController,
-                    passwordController: _passwordController,
-                    validateUsername: _validateUsername,
-                    validatePassword: _validatePassword,
+        child: Stack(
+          children: [
+            // Main content
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 40),
+                      // Header with logo and title
+                      const LoginHeader(),
+                      const SizedBox(height: 50),
+                      // Form fields
+                      LoginFormFields(
+                        usernameController: _usernameController,
+                        passwordController: _passwordController,
+                        validateUsername: _validateUsername,
+                        validatePassword: _validatePassword,
+                      ),
+                      const SizedBox(height: 32),
+                      // Login button
+                      Consumer<AuthViewModel>(
+                        builder: (context, authViewModel, child) {
+                          return CustomButton(
+                            text: 'Đăng nhập',
+                            onPressed: _handleLogin,
+                            isLoading: authViewModel.isLoading,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      // Footer with register link
+                      LoginFooter(
+                        onRegisterTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                          );
+                        },
+                        onGoogleSignIn: _handleGoogleSignIn,
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  const SizedBox(height: 32),
-                  // Login button
-                  Consumer<AuthViewModel>(
-                    builder: (context, authViewModel, child) {
-                      return CustomButton(
-                        text: 'Đăng nhập',
-                        onPressed: _handleLogin,
-                        isLoading: authViewModel.isLoading,
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  // Footer with register link
-                  LoginFooter(
-                    onRegisterTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                      );
-                    },
-                    onGoogleSignIn: _handleGoogleSignIn,
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
-          ),
+
+            // Back button - ngang bằng với logo
+            Positioned(
+              top: 40,
+              left: 25,
+              child: _buildBackButton(),
+            ),
+          ],
         ),
       ),
     );

@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Primary Brand Colors
   static const Color primaryGreen = Color(0xFF7FD957);
+
+  // Onboarding Button Colors (giống hệt floating button trong UI chính)
+  static const Color onboardingButton = Color(0xFF7FD957); // Xanh lá sáng giống primaryGreen
+  static const Color onboardingButtonHover = Color(0xFF5FB833); // Xanh lá đậm hơn giống floating button
   
   // Standard Colors
   static const Color white = Colors.white;
