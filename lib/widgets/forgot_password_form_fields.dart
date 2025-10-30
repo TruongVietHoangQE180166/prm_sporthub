@@ -41,24 +41,24 @@ class _ForgotPasswordFormFieldsState extends State<ForgotPasswordFormFields> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.outline,
               width: 1.5,
             ),
           ),
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey.shade400,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 16,
               ),
               prefixIcon: Icon(

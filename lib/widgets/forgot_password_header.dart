@@ -24,12 +24,12 @@ class ForgotPasswordHeader extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // Title
-        const Text(
+        Text(
           'Quên mật khẩu?',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: 0.5,
           ),
         ),
@@ -39,7 +39,7 @@ class ForgotPasswordHeader extends StatelessWidget {
           'Nhập email để nhận liên kết đặt lại mật khẩu',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,

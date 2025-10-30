@@ -129,10 +129,15 @@ class SkipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultTextColor = textColor ??
+        (Theme.of(context).brightness == Brightness.dark
+            ? Colors.white70
+            : AppColors.grey500);
+    
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        foregroundColor: textColor ?? AppColors.grey500,
+        foregroundColor: defaultTextColor,
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
@@ -142,7 +147,7 @@ class SkipButton extends StatelessWidget {
           fontSize: 14,
           fontWeight: FontWeight.w600,
           decoration: TextDecoration.underline,
-          decorationColor: textColor ?? AppColors.grey500,
+          decorationColor: defaultTextColor,
         ),
       ),
     );

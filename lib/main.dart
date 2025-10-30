@@ -10,6 +10,7 @@ import 'view_models/order_view_model.dart';
 import 'view_models/field_view_model.dart';
 import 'view_models/team_view_model.dart';
 import 'view_models/onboarding_view_model.dart';
+import 'view_models/theme_view_model.dart';
 import 'views/auth/login_screen.dart';
 import 'views/main/main_screen.dart';
 import 'views/find_team/find_team_screen.dart';
@@ -36,16 +37,20 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FieldViewModel()),
         ChangeNotifierProvider(create: (_) => TeamViewModel()),
         ChangeNotifierProvider(create: (_) => OnboardingViewModel()),
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
-      child: MaterialApp(
-        title: 'Flutter MVVM',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          useMaterial3: true,
-        ),
-        navigatorObservers: [FindTeamScreen.routeObserver],
-        home: const AppWrapper(),
+      child: Consumer<ThemeViewModel>(
+        builder: (context, themeViewModel, child) {
+          return MaterialApp(
+            title: 'Flutter MVVM',
+            debugShowCheckedModeBanner: false,
+            theme: themeViewModel.lightTheme,
+            darkTheme: themeViewModel.darkTheme,
+            themeMode: themeViewModel.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            navigatorObservers: [FindTeamScreen.routeObserver],
+            home: const AppWrapper(),
+          );
+        },
       ),
     );
   }

@@ -407,7 +407,7 @@ Hãy giúp khách hàng tìm được sân phù hợp nhất và kết nối v�
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: null,
       body: SafeArea(
         child: Column(
@@ -523,7 +523,7 @@ Container(
             
             // Loading indicator khi initialize
             if (_isInitializing)
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -532,7 +532,12 @@ Container(
                         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7FD957)),
                       ),
                       SizedBox(height: 16),
-                      Text('Đang tải thông tin sân và đội bóng...'),
+                      Text(
+                        'Đang tải thông tin sân và đội bóng...',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -541,7 +546,7 @@ Container(
               // Chat messages area
               Expanded(
                 child: Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   child: ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(16),
@@ -571,7 +576,7 @@ Container(
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 45),
                 decoration: BoxDecoration(
-                  border: Border(top: BorderSide(color: Colors.grey.shade300)),
+                  border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
                 ),
                 child: Row(
                   children: [
@@ -585,7 +590,7 @@ Container(
                             borderSide: BorderSide.none,
                           ),
                           filled: true,
-                          fillColor: Colors.grey.shade100,
+                          fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Colors.grey.shade100,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20,
                             vertical: 12,
@@ -646,7 +651,11 @@ class _ChatMessageWidget extends StatelessWidget {
           vertical: 12,
         ),
         decoration: BoxDecoration(
-          color: message.isUser ? const Color(0xFF7FD957) : Colors.grey.shade200,
+          color: message.isUser
+            ? const Color(0xFF7FD957)
+            : (Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade700
+                : Colors.grey.shade200),
           borderRadius: BorderRadius.circular(20),
         ),
         child: ConstrainedBox(
@@ -656,7 +665,11 @@ class _ChatMessageWidget extends StatelessWidget {
           child: Text(
             message.text,
             style: TextStyle(
-              color: message.isUser ? Colors.white : Colors.black87,
+              color: message.isUser
+                ? Colors.white
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black87),
             ),
             softWrap: true,
             overflow: TextOverflow.visible,
@@ -680,7 +693,9 @@ class _TypingIndicator extends StatelessWidget {
           vertical: 12,
         ),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey.shade700
+            : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -745,7 +760,9 @@ class _TypingDotState extends State<_TypingDot>
         width: 8,
         height: 8,
         decoration: BoxDecoration(
-          color: Colors.grey.shade600,
+          color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey.shade400
+            : Colors.grey.shade600,
           shape: BoxShape.circle,
         ),
       ),

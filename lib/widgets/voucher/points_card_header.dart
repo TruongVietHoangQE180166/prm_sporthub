@@ -21,7 +21,7 @@ class PointsCardHeader extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -55,21 +55,21 @@ class PointsCardHeader extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Điểm của bạn',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '$currentPoints điểm',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3436),
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : const Color(0xFF2D3436),
                           ),
                         ),
                       ],

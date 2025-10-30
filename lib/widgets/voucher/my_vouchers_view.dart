@@ -80,13 +80,13 @@ class _MyVouchersViewState extends State<MyVouchersView> {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.inventory_2_outlined,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[400],
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -95,7 +95,7 @@ class _MyVouchersViewState extends State<MyVouchersView> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[700],
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -103,7 +103,7 @@ class _MyVouchersViewState extends State<MyVouchersView> {
                   'Đổi voucher để nhận ưu đãi ngay!',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[500],
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
                   ),
                 ),
               ],

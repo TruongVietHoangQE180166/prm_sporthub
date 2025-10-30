@@ -45,18 +45,18 @@ class _UserInfoSectionState extends State<UserInfoSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Thông tin người dùng',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
                 ),
               ),
               IconButton(
                 icon: Icon(
                   widget.isEditing ? Icons.close : Icons.edit,
-                  color: Colors.black,
+                  color: Theme.of(context).iconTheme.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54),
                 ),
                 onPressed: widget.isEditing ? widget.onCancel : widget.onEditToggle,
               ),
@@ -76,8 +76,8 @@ class _UserInfoSectionState extends State<UserInfoSection> {
                 ElevatedButton(
                   onPressed: widget.onCancel,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    foregroundColor: Colors.black,
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[300],
+                    foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -120,10 +120,10 @@ class _UserInfoSectionState extends State<UserInfoSection> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black54,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -139,7 +139,12 @@ class _UserInfoSectionState extends State<UserInfoSection> {
                                 onChanged: widget.onGenderChanged,
                                 activeColor: const Color(0xFF7FD957),
                               ),
-                              Text(gender),
+                              Text(
+                                gender,
+                                style: TextStyle(
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
+                                ),
+                              ),
                               const SizedBox(width: 16),
                             ],
                           );
@@ -149,7 +154,9 @@ class _UserInfoSectionState extends State<UserInfoSection> {
                         widget.selectedGender.isNotEmpty ? widget.selectedGender : 'Chưa thêm',
                         style: TextStyle(
                           fontSize: 16,
-                          color: widget.selectedGender.isNotEmpty ? Colors.black87 : Colors.grey,
+                          color: widget.selectedGender.isNotEmpty
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87)
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey),
                         ),
                       ),
               ],
@@ -175,10 +182,10 @@ class _UserInfoSectionState extends State<UserInfoSection> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black54,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -186,7 +193,7 @@ class _UserInfoSectionState extends State<UserInfoSection> {
                     ? TextFormField(
                         controller: controller,
                         readOnly: onTap != null, // Make read-only if onTap is provided (for date picker)
-                        onTap: onTap != null ? () => onTap(context) : null,
+                        onTap: onTap != null ? () => onTap!(context) : null,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           border: const OutlineInputBorder(
@@ -204,7 +211,9 @@ class _UserInfoSectionState extends State<UserInfoSection> {
                         controller?.text.isNotEmpty == true ? controller!.text : 'Chưa thêm',
                         style: TextStyle(
                           fontSize: 16,
-                          color: controller?.text.isNotEmpty == true ? Colors.black87 : Colors.grey,
+                          color: controller?.text.isNotEmpty == true
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87)
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey),
                         ),
                       ),
               ],

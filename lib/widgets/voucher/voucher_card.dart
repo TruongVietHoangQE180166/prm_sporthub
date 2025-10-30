@@ -19,7 +19,7 @@ class VoucherCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -31,7 +31,7 @@ class VoucherCard extends StatelessWidget {
         border: Border.all(
           color: canExchange
               ? const Color(0xFF7FD957).withOpacity(0.3)
-              : Colors.grey[200]!,
+              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[200]!),
           width: 1.5,
         ),
       ),
@@ -153,7 +153,9 @@ class VoucherCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: canExchange ? Colors.grey[800] : Colors.grey[500],
+                          color: canExchange
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey[800])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500]),
                         ),
                       ),
                     ],
@@ -165,14 +167,18 @@ class VoucherCard extends StatelessWidget {
                       Icon(
                         Icons.shopping_bag_outlined,
                         size: 14,
-                        color: canExchange ? Colors.grey[600] : Colors.grey[400],
+                        color: canExchange
+                            ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600])
+                            : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400]),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         'Tối thiểu ${voucher.minOrderText}đ',
                         style: TextStyle(
                           fontSize: 11,
-                          color: canExchange ? Colors.grey[600] : Colors.grey[400],
+                          color: canExchange
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400]),
                         ),
                       ),
                     ],
@@ -187,7 +193,7 @@ class VoucherCard extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.grey[300]!,
+                          Theme.of(context).brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[300]!,
                           Colors.transparent,
                         ],
                       ),
@@ -198,9 +204,9 @@ class VoucherCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: canExchange 
+                      color: canExchange
                           ? const Color(0xFF7FD957).withOpacity(0.1)
-                          : Colors.grey[100],
+                          : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100]),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -234,8 +240,8 @@ class VoucherCard extends StatelessWidget {
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: canExchange
-                                ? const Color(0xFF2D3436)
-                                : Colors.grey[500],
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2D3436))
+                                : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500]),
                           ),
                         ),
                         const SizedBox(width: 3),
@@ -243,7 +249,9 @@ class VoucherCard extends StatelessWidget {
                           'điểm',
                           style: TextStyle(
                             fontSize: 12,
-                            color: canExchange ? Colors.grey[600] : Colors.grey[400],
+                            color: canExchange
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600])
+                                : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400]),
                           ),
                         ),
                       ],
@@ -260,8 +268,8 @@ class VoucherCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7FD957),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey[300],
-                        disabledForegroundColor: Colors.grey[500],
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[300],
+                        disabledForegroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

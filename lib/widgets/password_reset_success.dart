@@ -14,12 +14,12 @@ class PasswordResetSuccess extends StatelessWidget {
           color: const Color(0xFF7FD957),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Đặt lại mật khẩu thành công!',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 12),
@@ -27,7 +27,7 @@ class PasswordResetSuccess extends StatelessWidget {
           'Bạn có thể đăng nhập với mật khẩu mới',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           textAlign: TextAlign.center,
         ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../view_models/theme_view_model.dart';
 
 class AppSettingsScreen extends StatelessWidget {
   const AppSettingsScreen({super.key});
@@ -82,8 +84,220 @@ class AppSettingsScreen extends StatelessWidget {
             
             // Content area
             Expanded(
-              child: Center(
-                child: const Text('Settings Screen - Add your design here'),
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    // Dark Mode Section
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF7FD957).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                context.watch<ThemeViewModel>().isDarkMode
+                                    ? Icons.dark_mode
+                                    : Icons.light_mode,
+                                color: const Color(0xFF7FD957),
+                                size: 24,
+                              ),
+                            ),
+                            title: const Text(
+                              'Chế độ tối',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              context.watch<ThemeViewModel>().isDarkMode
+                                  ? 'Đang bật chế độ tối'
+                                  : 'Đang tắt chế độ tối',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            trailing: Switch(
+                              value: context.watch<ThemeViewModel>().isDarkMode,
+                              onChanged: (value) {
+                                context.read<ThemeViewModel>().toggleTheme();
+                              },
+                              activeColor: const Color(0xFF7FD957),
+                            ),
+                          ),
+                          Divider(height: 1, color: Colors.grey.shade200),
+                          const ListTile(
+                            leading: SizedBox(width: 56), // Same width as the switch area
+                            title: Text(
+                              'Chế độ tối giúp bảo vệ mắt và tiết kiệm pin khi sử dụng ứng dụng vào ban đêm.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Other settings sections can be added here
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(
+                              Icons.notifications_outlined,
+                              color: Color(0xFF7FD957),
+                              size: 24,
+                            ),
+                            title: Text(
+                              'Thông báo',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Quản lý thông báo ứng dụng',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Divider(height: 1, color: Colors.grey),
+                          ListTile(
+                            leading: Icon(
+                              Icons.language_outlined,
+                              color: Color(0xFF7FD957),
+                              size: 24,
+                            ),
+                            title: Text(
+                              'Ngôn ngữ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Tiếng Việt',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Divider(height: 1, color: Colors.grey),
+                          ListTile(
+                            leading: Icon(
+                              Icons.help_outline,
+                              color: Color(0xFF7FD957),
+                              size: 24,
+                            ),
+                            title: Text(
+                              'Trợ giúp & Hỗ trợ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Câu hỏi thường gặp, liên hệ hỗ trợ',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // App info section
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Column(
+                        children: [
+                          ListTile(
+                            title: Text(
+                              'Phiên bản ứng dụng',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '1.0.0',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

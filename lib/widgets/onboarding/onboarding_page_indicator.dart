@@ -23,16 +23,21 @@ class OnboardingPageIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveActiveColor = activeColor;
+    final effectiveInactiveColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white24
+        : inactiveColor;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         totalPages,
-        (index) => _buildDot(index),
+        (index) => _buildDot(index, effectiveActiveColor, effectiveInactiveColor),
       ),
     );
   }
 
-  Widget _buildDot(int index) {
+  Widget _buildDot(int index, Color effectiveActiveColor, Color effectiveInactiveColor) {
     final isActive = index == currentPage;
     
     return AnimatedContainer(
@@ -44,12 +49,12 @@ class OnboardingPageIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: isActive
             ? LinearGradient(
-                colors: [activeColor, activeColor.withOpacity(0.8)],
+                colors: [effectiveActiveColor, effectiveActiveColor.withOpacity(0.8)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               )
             : null,
-        color: isActive ? null : inactiveColor,
+        color: isActive ? null : effectiveInactiveColor,
         borderRadius: BorderRadius.circular(dotSize / 2),
       ),
     );

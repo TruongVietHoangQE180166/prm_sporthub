@@ -14,13 +14,15 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Container(
       height: 56,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF7FD957),
-            Color(0xFF7FD957),
+            theme.primaryColor,
+            theme.primaryColor.withOpacity(0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -28,7 +30,7 @@ class CustomButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7FD957).withOpacity(0.5),
+            color: theme.primaryColor.withOpacity(0.5),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -41,18 +43,18 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Center(
             child: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                       strokeWidth: 2.5,
                     ),
                   )
                 : Text(
                     text,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
