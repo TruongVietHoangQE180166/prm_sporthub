@@ -42,11 +42,11 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).shadowColor.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -102,12 +102,12 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: Theme.of(context).colorScheme.surface,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.expand_more,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 20,
                           ),
                         ),
@@ -167,18 +167,22 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
                           child: OutlinedButton(
                             onPressed: widget.onCancelPasswordChanges,
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.black87,
+                              foregroundColor: Theme.of(context).colorScheme.onSurface,
                               padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: BorderSide(color: Colors.grey[300]!, width: 1.5),
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.outline,
+                                width: 1.5
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Hủy',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -197,11 +201,12 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Lưu',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onPrimary,
                               ),
                             ),
                           ),
@@ -234,30 +239,36 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black54,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 4),
               TextFormField(
                 controller: controller,
                 obscureText: isObscured,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    borderSide: BorderSide(color: Colors.grey),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                   ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    borderSide: BorderSide(color: Colors.grey),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       isObscured ? Icons.visibility : Icons.visibility_off,
                       size: 20,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                     onPressed: onVisibilityToggle,
                   ),

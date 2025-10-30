@@ -21,7 +21,7 @@ class ForgotPasswordFooter extends StatelessWidget {
             Text(
               'Đã nhớ mật khẩu? ',
               style: TextStyle(
-                color: Colors.grey.shade700,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 15,
               ),
             ),
@@ -46,7 +46,7 @@ class ForgotPasswordFooter extends StatelessWidget {
             Text(
               'Chưa có tài khoản? ',
               style: TextStyle(
-                color: Colors.grey.shade700,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 15,
               ),
             ),

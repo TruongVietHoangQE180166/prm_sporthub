@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../view_models/auth_view_model.dart';
+import '../../view_models/theme_view_model.dart';
 import '../../widgets/custom_button.dart';
 import '../main/main_screen.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -55,7 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (mounted) {
         if (success) {
-          // Show success message before navigating
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Đăng nhập thành công!'),
@@ -66,8 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           );
-          
-          // Navigate to main screen after a delay
+
+          // Navigate to main screen after short delay
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
               Navigator.pushReplacement(
@@ -92,6 +92,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Chức năng đăng nhập Google đang được phát triển'),
+        backgroundColor: Colors.blue.shade400,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBackButton() {
     return Container(
       width: 44,
@@ -103,10 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white,
-          width: 2.0,
-        ),
+        border: Border.all(color: Colors.white, width: 2.0),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF7FD957).withOpacity(0.5),
@@ -136,28 +146,46 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _handleGoogleSignIn() async {
-    // TODO: Implement Google Sign In
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Chức năng đăng nhập Google đang được phát triển'),
-        backgroundColor: Colors.blue.shade400,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(top: 40),
+        child: Consumer<ThemeViewModel>(
+          builder: (context, themeViewModel, child) {
+            return Container(
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: themeViewModel.toggleTheme,
+                icon: Icon(
+                  themeViewModel.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: theme.iconTheme.color,
+                ),
+                tooltip: themeViewModel.isDarkMode
+                    ? 'Chuyển sang chế độ sáng'
+                    : 'Chuyển sang chế độ tối',
+              ),
+            );
+          },
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
       body: SafeArea(
         child: Stack(
           children: [
-            // Main content
+            // Main login form
             SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -167,10 +195,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 40),
-                      // Header with logo and title
                       const LoginHeader(),
                       const SizedBox(height: 50),
-                      // Form fields
                       LoginFormFields(
                         usernameController: _usernameController,
                         passwordController: _passwordController,
@@ -178,7 +204,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         validatePassword: _validatePassword,
                       ),
                       const SizedBox(height: 32),
-                      // Login button
                       Consumer<AuthViewModel>(
                         builder: (context, authViewModel, child) {
                           return CustomButton(
@@ -189,7 +214,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      // Footer with register link
                       LoginFooter(
                         onRegisterTap: () {
                           Navigator.push(
@@ -206,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-            // Back button - ngang bằng với logo
+            // Back button aligned with logo
             Positioned(
               top: 40,
               left: 25,

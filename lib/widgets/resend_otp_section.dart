@@ -55,7 +55,7 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Không có email để gửi OTP'),
-          backgroundColor: Colors.red.shade400,
+          backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -73,7 +73,7 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Mã OTP mới đã được gửi đến email của bạn'),
-            backgroundColor: const Color(0xFF7FD957),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -85,7 +85,7 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authViewModel.errorMessage ?? 'Gửi OTP thất bại'),
-            backgroundColor: Colors.red.shade400,
+            backgroundColor: Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -107,8 +107,8 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
           style: TextStyle(
             fontSize: 14,
             color: _isResendEnabled 
-              ? Colors.grey.shade700 
-              : Colors.grey.shade600,
+              ? Theme.of(context).colorScheme.onSurfaceVariant
+              : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
@@ -125,8 +125,8 @@ class _ResendOtpSectionState extends State<ResendOtpSection> {
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: _isResendEnabled && !authViewModel.isLoading
-                    ? const Color(0xFF7FD957) 
-                    : Colors.grey.shade400,
+                    ? const Color(0xFF7FD957)
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             );

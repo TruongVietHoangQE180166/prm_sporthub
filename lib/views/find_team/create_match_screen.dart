@@ -65,7 +65,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: null,
       body: SafeArea(
         child: Column(
@@ -148,12 +148,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Match name
-                      const Text(
+                      Text(
                         'Tên trận đấu',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -162,7 +162,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập tên trận đấu',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -196,12 +196,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Description
-                      const Text(
+                      Text(
                         'Mô tả',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -211,7 +211,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập mô tả trận đấu',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -239,12 +239,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Sport
-                      const Text(
+                      Text(
                         'Môn thể thao',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -252,7 +252,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         value: _nameSportController.text.isEmpty ? null : _nameSportController.text,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -294,12 +294,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Date and time
-                      const Text(
+                      Text(
                         'Thời gian',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -308,7 +308,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Chọn ngày và giờ',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -351,12 +351,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Max players
-                      const Text(
+                      Text(
                         'Số người tối đa',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -365,7 +365,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập số người tối đa',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -404,12 +404,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Location
-                      const Text(
+                      Text(
                         'Địa điểm',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -418,7 +418,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập địa điểm',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -452,12 +452,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Level
-                      const Text(
+                      Text(
                         'Trình độ',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -465,7 +465,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         value: _selectedLevel,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -506,12 +506,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Phone number
-                      const Text(
+                      Text(
                         'Số điện thoại',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -520,7 +520,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập số điện thoại',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -561,12 +561,12 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                       const SizedBox(height: 16),
                       
                       // Facebook link
-                      const Text(
+                      Text(
                         'Link Facebook',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -575,7 +575,7 @@ class _CreateMatchScreenState extends State<CreateMatchScreen> {
                         decoration: InputDecoration(
                           hintText: 'Nhập link Facebook',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).cardColor,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,

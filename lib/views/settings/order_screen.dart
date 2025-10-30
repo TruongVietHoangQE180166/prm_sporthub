@@ -115,7 +115,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF121212) : const Color(0xFFF5F7FA),
       appBar: null,
       body: SafeArea(
         child: Column(
@@ -196,7 +196,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   // Search bar
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -216,19 +216,19 @@ class _OrderScreenState extends State<OrderScreen> {
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm theo mã đơn hàng...',
                         hintStyle: TextStyle(
-                          color: Colors.grey[400],
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
                           fontSize: 15,
                         ),
                         prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.grey[600],
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                           size: 22,
                         ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
                                 icon: Icon(
                                   Icons.clear,
-                                  color: Colors.grey[600],
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                   size: 20,
                                 ),
                                 onPressed: () {
@@ -247,10 +247,10 @@ class _OrderScreenState extends State<OrderScreen> {
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                       ),
                     ),
                   ),
@@ -264,7 +264,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
@@ -278,9 +278,9 @@ class _OrderScreenState extends State<OrderScreen> {
                               children: [
                                 Icon(
                                   Icons.calendar_today,
-                                  color: _selectedDate != null 
-                                      ? const Color(0xFF7FD957) 
-                                      : Colors.grey[600],
+                                  color: _selectedDate != null
+                                      ? const Color(0xFF7FD957)
+                                      : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                                   size: 20,
                                 ),
                                 const SizedBox(width: 12),
@@ -292,9 +292,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
-                                      color: _selectedDate != null 
-                                          ? const Color(0xFF7FD957) 
-                                          : Colors.grey[600],
+                                      color: _selectedDate != null
+                                          ? const Color(0xFF7FD957)
+                                          : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                                     ),
                                   ),
                                 ),
@@ -302,7 +302,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   IconButton(
                                     icon: Icon(
                                       Icons.clear,
-                                      color: Colors.grey[600],
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                       size: 20,
                                     ),
                                     onPressed: _clearDateFilter,
@@ -319,7 +319,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -333,19 +333,19 @@ class _OrderScreenState extends State<OrderScreen> {
                       children: [
                         Icon(
                           Icons.filter_alt,
-                          color: _selectedStatus != null 
-                              ? const Color(0xFF7FD957) 
-                              : Colors.grey[600],
+                          color: _selectedStatus != null
+                              ? const Color(0xFF7FD957)
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
                           size: 20,
                         ),
                         const SizedBox(width: 12),
                         if (_selectedStatus == null) ...[
-                          const Text(
+                          Text(
                             'Trạng thái:',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -373,7 +373,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           IconButton(
                             icon: Icon(
                               Icons.clear,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                               size: 20,
                             ),
                             onPressed: _clearStatusFilter,
@@ -398,7 +398,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -414,12 +414,12 @@ class _OrderScreenState extends State<OrderScreen> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Text(
+                          Text(
                             'Đang tải đơn hàng...',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black54,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
                             ),
                           ),
                         ],
@@ -433,7 +433,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         margin: const EdgeInsets.all(24),
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -527,22 +527,22 @@ class _OrderScreenState extends State<OrderScreen> {
                           const SizedBox(height: 24),
                           Text(
                             _searchQuery.isEmpty && _selectedDate == null && _selectedStatus == null
-                                ? 'Chưa có đơn hàng nào' 
+                                ? 'Chưa có đơn hàng nào'
                                 : 'Không tìm thấy đơn hàng',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             _searchQuery.isEmpty && _selectedDate == null && _selectedStatus == null
-                                ? 'Hãy đặt sân để tạo đơn hàng đầu tiên' 
+                                ? 'Hãy đặt sân để tạo đơn hàng đầu tiên'
                                 : 'Vui lòng thử lại với điều kiện khác',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                             ),
                           ),
                         ],
@@ -600,7 +600,7 @@ class _OrderScreenState extends State<OrderScreen> {
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -709,10 +709,10 @@ class _OrderScreenState extends State<OrderScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF2A2A2A) : Colors.grey[50],
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: Colors.grey[200]!,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[200]!,
                       width: 1,
                     ),
                   ),
@@ -723,12 +723,14 @@ class _OrderScreenState extends State<OrderScreen> {
                         'Tổng tiền',
                         '${order.totalAmount} VND',
                         isHighlight: true,
+                        context: context,
                       ),
                       const SizedBox(height: 14),
                       _buildOrderInfoRow(
                         Icons.access_time_outlined,
                         'Ngày tạo',
                         _formatDateTime(order.createdDate),
+                        context: context,
                       ),
                     ],
                   ),
@@ -747,13 +749,13 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget _buildOrderInfoRow(IconData icon, String label, String value, {bool isHighlight = false}) {
+  Widget _buildOrderInfoRow(IconData icon, String label, String value, {bool isHighlight = false, BuildContext? context}) {
     return Row(
       children: [
         Icon(
           icon,
           size: 20,
-          color: isHighlight ? const Color(0xFF7FD957) : Colors.grey[600],
+          color: isHighlight ? const Color(0xFF7FD957) : (context != null && Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -765,7 +767,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
+                  color: context != null && Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                 ),
               ),
               const SizedBox(height: 2),
@@ -774,7 +776,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 style: TextStyle(
                   fontSize: isHighlight ? 16 : 14,
                   fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w600,
-                  color: isHighlight ? const Color(0xFF7FD957) : Colors.black87,
+                  color: isHighlight ? const Color(0xFF7FD957) : (context != null && Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
                 ),
               ),
             ],
@@ -886,12 +888,12 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Chi tiết đặt sân',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                   letterSpacing: 0.2,
                 ),
               ),
@@ -943,10 +945,9 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.white,
-            Colors.grey[50]!,
-          ],
+          colors: Theme.of(context).brightness == Brightness.dark
+              ? [const Color(0xFF1E1E1E), const Color(0xFF2A2A2A)]
+              : [Colors.white, Colors.grey[50]!],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -1035,16 +1036,16 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
                     Icon(
                       Icons.stadium_outlined,
                       size: 20,
-                      color: Colors.grey[700],
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[700],
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         booking.fieldName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                           letterSpacing: 0.2,
                         ),
                       ),
@@ -1061,7 +1062,7 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
                 ),
@@ -1095,10 +1096,10 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
                             const SizedBox(width: 12),
                             Text(
                               '${_formatTimeString(booking.startTime!)} - ${_formatTimeString(booking.endTime!)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black87,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                               ),
                             ),
                           ],
@@ -1126,10 +1127,10 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
                             Expanded(
                               child: Text(
                                 _formatDateString(booking.startTime!),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                                 ),
                               ),
                             ),
@@ -1169,12 +1170,12 @@ class _BookingDetailsSectionState extends State<_BookingDetailsSection> {
                             color: const Color(0xFF7FD957),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'Thành tiền',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                             ),
                           ),
                         ],

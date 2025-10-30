@@ -16,7 +16,7 @@ class UserVoucherCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -28,7 +28,7 @@ class UserVoucherCard extends StatelessWidget {
         border: Border.all(
           color: canUseVoucher
               ? const Color(0xFF7FD957)
-              : Colors.grey[300]!,
+              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
           width: 1.5,
         ),
       ),
@@ -146,7 +146,7 @@ class UserVoucherCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: canUseVoucher
                           ? const Color(0xFF7FD957).withOpacity(0.15)
-                          : Colors.grey[200],
+                          : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200]),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -178,7 +178,9 @@ class UserVoucherCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isUsed || !isActive ? Colors.grey[700] : Colors.grey[800],
+                          color: isUsed || !isActive
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[700])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[800]),
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -199,7 +201,9 @@ class UserVoucherCard extends StatelessWidget {
                         'Tối thiểu ${voucher.minOrderText}đ',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isUsed || !isActive ? Colors.grey[400] : Colors.grey[600],
+                          color: isUsed || !isActive
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600]),
                         ),
                       ),
                     ],
@@ -219,7 +223,9 @@ class UserVoucherCard extends StatelessWidget {
                         'Điểm đổi: ${voucher.exchangePoint}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isUsed || !isActive ? Colors.grey[400] : Colors.grey[600],
+                          color: isUsed || !isActive
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600]),
                         ),
                       ),
                     ],
@@ -239,7 +245,9 @@ class UserVoucherCard extends StatelessWidget {
                         'Ngày tạo: ${voucher.createdDate.day}/${voucher.createdDate.month}/${voucher.createdDate.year}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isUsed || !isActive ? Colors.grey[400] : Colors.grey[600],
+                          color: isUsed || !isActive
+                              ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400])
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[600]),
                         ),
                       ),
                     ],
@@ -253,7 +261,7 @@ class UserVoucherCard extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.grey[300]!,
+                          Theme.of(context).brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[300]!,
                           Colors.transparent,
                         ],
                       ),
@@ -267,12 +275,12 @@ class UserVoucherCard extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: canUseVoucher ? (onUseVoucher ?? () {}) : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: canUseVoucher 
+                        backgroundColor: canUseVoucher
                             ? const Color(0xFF7FD957)
-                            : Colors.grey[300],
+                            : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[300]),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey[300],
-                        disabledForegroundColor: Colors.grey[500],
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[300],
+                        disabledForegroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

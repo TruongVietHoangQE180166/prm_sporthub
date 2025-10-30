@@ -24,12 +24,12 @@ class ResetPasswordHeader extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // Title
-        const Text(
+        Text(
           'Đặt lại mật khẩu',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: 0.5,
           ),
         ),
@@ -39,7 +39,7 @@ class ResetPasswordHeader extends StatelessWidget {
           'Nhập mã OTP và mật khẩu mới',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w400,
           ),
         ),

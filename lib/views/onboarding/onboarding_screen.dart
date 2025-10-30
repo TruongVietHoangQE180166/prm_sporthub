@@ -38,10 +38,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
             return Scaffold(
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               body: Center(
                 child: CircularProgressIndicator(
-                  color: Color(0xFF7FD957),
+                  color: Theme.of(context).primaryColor,
                   strokeWidth: 3.5,
                 ),
               ),
@@ -53,7 +53,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           }
 
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: Stack(
               children: [
                 // Animated background
@@ -104,7 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildAnimatedBackground() {
     return Positioned.fill(
       child: Container(
-        color: Colors.white, // Nền trắng giống UI chính
+        color: Theme.of(context).scaffoldBackgroundColor, // Responsive với theme
         child: CustomPaint(
           painter: OnboardingBackgroundPainter(),
         ),

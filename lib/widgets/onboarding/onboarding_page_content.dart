@@ -28,12 +28,12 @@ class OnboardingPageContent extends StatelessWidget {
           SizedBox(height: 40),
 
           // Title section
-          _buildTitle(),
+          _buildTitle(context),
 
           SizedBox(height: 16),
 
           // Description section
-          _buildDescription(),
+          _buildDescription(context),
 
           SizedBox(height: 40),
         ],
@@ -93,13 +93,13 @@ class OnboardingPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(BuildContext context) {
     return Text(
       pageData.title,
       style: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.w800,
-        color: Colors.grey.shade900,
+        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.grey.shade900,
         letterSpacing: -0.5,
         height: 1.2,
       ),
@@ -107,13 +107,13 @@ class OnboardingPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(BuildContext context) {
     return Text(
       pageData.description,
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        color: Colors.grey.shade600,
+        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? Colors.grey.shade600,
         height: 1.4,
       ),
       textAlign: TextAlign.center,

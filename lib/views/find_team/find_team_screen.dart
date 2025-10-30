@@ -111,7 +111,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: null, // Hide default app bar
       body: SafeArea( // Add SafeArea to handle notches and cutouts properly
         child: Column(
@@ -121,7 +121,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -134,12 +134,12 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Tìm kiếm đội bóng...',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6) ?? Colors.grey[400]),
                     border: InputBorder.none,
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     prefixIcon: const Icon(Icons.search, color: Color(0xFF7FD957)),
-                    suffixIcon: Icon(Icons.tune, color: Colors.grey[400]),
+                    suffixIcon: Icon(Icons.tune, color: Theme.of(context).iconTheme.color?.withOpacity(0.6) ?? Colors.grey[400]),
                   ),
                 ),
               ),
@@ -163,7 +163,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).cardColor,
                           foregroundColor: const Color(0xFF7FD957),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -238,7 +238,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -311,7 +311,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -393,7 +393,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
             // Content area
             Expanded(
               child: Container(
-                color: Colors.white,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: Consumer<TeamViewModel>(
                   builder: (context, teamViewModel, child) {
                     if (teamViewModel.isLoading) {
@@ -448,7 +448,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                     // Apply time filter
                     if (_selectedTimeFilter != null) {
                       filteredTeams = filteredTeams.where((team) {
-                        final DateTime matchTime = team.timeMatch;
+                        final DateTime matchTime = team.timeMatch as DateTime;
                         final DateTime now = DateTime.now();
                         
                         switch (_selectedTimeFilter) {
@@ -626,7 +626,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -684,10 +684,10 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                           Expanded(
                             child: Text(
                               team['nameMatch'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black87,
+                                color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                                 letterSpacing: 0.2,
                               ),
                               maxLines: 1,
@@ -711,7 +711,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? Colors.grey[600],
                             ),
                           ),
                         ],
@@ -773,20 +773,20 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Mô tả:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? Colors.grey[600],
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         team['descriptionMatch'],
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[700],
+                          color: Colors.grey,
                         ),
                         maxLines: isExpanded ? null : 2, // Show all lines when expanded
                         overflow: isExpanded ? null : TextOverflow.ellipsis,
@@ -814,9 +814,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                     Expanded(
                       child: Text(
                         team['location'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                     ),
@@ -841,9 +841,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                     const SizedBox(width: 12),
                     Text(
                       '$formattedDate lúc $formattedTime',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -886,9 +886,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                     const SizedBox(width: 12),
                     Text(
                       'Số người: $currentPlayers/${team['maxPlayers']}', // Show current count
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -978,9 +978,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                       const SizedBox(width: 8),
                       Text(
                         team['numberPhone'] ?? 'Chưa cung cấp',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                         ),
                       ),
                     ],
@@ -1006,9 +1006,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                       Expanded(
                         child: Text(
                           team['linkFacebook'] ?? 'Chưa cung cấp',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black87,
+                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -1077,7 +1077,7 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                       ),
                       child: const Text(
                         'Chưa có người tham gia khác',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
                         ),
@@ -1119,9 +1119,9 @@ class _FindTeamScreenContentState extends State<FindTeamScreenContent>
                               Expanded(
                                 child: Text(
                                   member is Map ? (member['username'] ?? 'Người dùng') : 'Người dùng',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.black87,
+                                    color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                                   ),
                                 ),
                               ),

@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : fieldViewModel.fields;
           
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: SafeArea(
               child: fieldViewModel.isLoading
                   ? Center(
@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             'Đang tải dữ liệu...',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade600,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
@@ -118,10 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             margin: const EdgeInsets.all(32),
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.red.shade50,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade900.withOpacity(0.1) : Colors.red.shade50,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.red.shade200,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade700 : Colors.red.shade200,
                                 width: 1,
                               ),
                             ),
@@ -131,13 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Icon(
                                   Icons.error_outline,
                                   size: 64,
-                                  color: Colors.red.shade400,
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade300 : Colors.red.shade400,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   fieldViewModel.errorMessage!,
                                   style: TextStyle(
-                                    color: Colors.red.shade700,
+                                    color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade300 : Colors.red.shade700,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -168,36 +168,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                       : CustomScrollView(
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        slivers: [
-                          SliverToBoxAdapter(child: _buildAppBar()),
-                          SliverToBoxAdapter(child: _buildSearchSection()),
-                          SliverToBoxAdapter(child: _buildCategorySection()),
-                          SliverToBoxAdapter(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: 220, // Giới hạn chiều cao tối đa cho carousel
-                              ),
-                              child: _buildPromoCarousel(),
-                            ),
-                          ),
-                          SliverToBoxAdapter(child: _buildQuickActions()),
-                          SliverToBoxAdapter(child: _buildSectionHeader('Sân gần bạn')),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  print('DEBUG: Building field card for index $index, total fields: ${displayFields.length}');
-                                  return _buildFieldCardFromModel(displayFields[index]);
-                                },
-                                childCount: displayFields.length,
+                          slivers: [
+                            SliverToBoxAdapter(child: _buildAppBar()),
+                            SliverToBoxAdapter(child: _buildSearchSection()),
+                            SliverToBoxAdapter(child: _buildCategorySection()),
+                            SliverToBoxAdapter(child: _buildPromoCarousel()),
+                            SliverToBoxAdapter(child: _buildQuickActions()),
+                            SliverToBoxAdapter(child: _buildSectionHeader('Sân gần bạn')),
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => _buildFieldCardFromModel(displayFields[index]),
+                                  childCount: displayFields.length,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
             ),
             bottomNavigationBar: null,
           );
@@ -210,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
@@ -297,10 +285,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: Theme.of(context).inputDecorationTheme.fillColor ?? Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.grey.shade200,
+                  color: Theme.of(context).inputDecorationTheme.enabledBorder?.borderSide.color ?? Colors.grey.shade200,
                   width: 1.5,
                 ),
               ),
@@ -308,13 +296,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: InputDecoration(
                   hintText: 'Tìm kiếm sân thể thao...',
                   hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6) ?? Colors.grey.shade400,
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                   ),
                   prefixIcon: Icon(
                     Icons.search_rounded,
-                    color: Colors.grey.shade400,
+                    color: Theme.of(context).iconTheme.color?.withOpacity(0.6) ?? Colors.grey.shade400,
                     size: 22,
                   ),
                   border: InputBorder.none,
@@ -365,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCategorySection() {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.only(bottom: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: Colors.grey.shade900,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade900),
                 letterSpacing: -0.5,
               ),
             ),
@@ -404,14 +392,14 @@ class _HomeScreenState extends State<HomeScreen> {
       width: 90,
       margin: const EdgeInsets.symmetric(horizontal: 6),
       child: Material(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
         elevation: 0,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).dividerColor,
               width: 1.5,
             ),
           ),
@@ -437,15 +425,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 48,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Colors.grey.shade100,
-                          Colors.grey.shade200,
-                        ],
+                        colors: Theme.of(context).brightness == Brightness.dark
+                          ? [
+                              Colors.grey.shade700,
+                              Colors.grey.shade600,
+                            ]
+                          : [
+                              Colors.grey.shade100,
+                              Colors.grey.shade200,
+                            ],
                       ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade300.withOpacity(0.3),
+                          color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.grey.shade300.withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -453,7 +448,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: Icon(
                       category['icon'] as IconData,
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.grey.shade700,
                       size: 24,
                     ),
                   ),
@@ -463,7 +460,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white70
+                        : Colors.grey.shade700,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -540,7 +539,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         colors: [Color(0xFF7FD957), Color(0xFF5FB839)],
                       )
                     : null,
-                color: _currentPromoPage == index ? null : Colors.grey.shade300,
+                color: _currentPromoPage == index
+                  ? null
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade600
+                      : Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -692,12 +695,20 @@ class _HomeScreenState extends State<HomeScreen> {
     final colors = [
       {'bg': const Color(0xFF7FD957), 'text': Colors.white},
       {'bg': Colors.grey.shade700, 'text': Colors.white},
-      {'bg': Colors.grey.shade900, 'text': Colors.white},
-      {'bg': Colors.grey.shade400, 'text': Colors.grey.shade900},
+      {'bg': Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade700
+          : Colors.grey.shade800, 'text': Colors.white},
+      {'bg': Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
+       'text': Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : Colors.grey.shade900},
     ];
     
     final color = colors[index];
-    final isWhiteBg = color['bg'] == Colors.white;
+    final isWhiteBg = color['bg'] == Colors.white ||
+                     (Theme.of(context).brightness == Brightness.dark && index == 3);
     
     // Define navigation destinations for each action
     void Function()? onTap;
@@ -752,7 +763,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: color['bg'] as Color,
         borderRadius: BorderRadius.circular(16),
         border: isWhiteBg
-            ? Border.all(color: Colors.grey.shade200, width: 1.5)
+            ? Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade600 : Colors.grey.shade200, width: 1.5)
             : null,
         boxShadow: [
           BoxShadow(
@@ -805,7 +816,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
-              color: Colors.grey.shade900,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade900),
               letterSpacing: -0.5,
             ),
           ),
@@ -861,10 +872,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: Theme.of(context).dividerColor,
           width: 1,
         ),
         boxShadow: [
@@ -949,7 +960,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade900,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade900),
                           letterSpacing: -0.3,
                         ),
                         maxLines: 1,
@@ -997,7 +1008,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Icon(
                             Icons.location_on_rounded,
-                            color: Colors.grey.shade500,
+                            color: Theme.of(context).iconTheme.color?.withOpacity(0.7) ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade500),
                             size: 16,
                           ),
                           const SizedBox(width: 4),
@@ -1006,7 +1017,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               field.location,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade600,
+                                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade600),
                                 fontWeight: FontWeight.w500,
                               ),
                               maxLines: 1,
@@ -1020,7 +1031,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Icon(
                             Icons.access_time_rounded,
-                            color: Colors.grey.shade500,
+                            color: Theme.of(context).iconTheme.color?.withOpacity(0.7) ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade500),
                             size: 16,
                           ),
                           const SizedBox(width: 4),
@@ -1028,7 +1039,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             '${field.openTime} - ${field.closeTime}',
                             style: TextStyle(
                               fontSize: 15,
-                              color: Colors.grey.shade600,
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8) ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey.shade600),
                               fontWeight: FontWeight.w500,
                             ),
                           ),

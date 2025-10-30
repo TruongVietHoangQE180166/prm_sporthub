@@ -29,6 +29,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Theme.of(context).dialogTheme.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -52,9 +53,10 @@ class CustomConfirmationDialog extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.titleLarge?.color ?? Colors.white,
               ),
             ),
           ),
@@ -68,10 +70,10 @@ class CustomConfirmationDialog extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 height: 1.5,
-                color: Colors.black87,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.white70,
               ),
             ),
           ),
@@ -93,9 +95,9 @@ class CustomConfirmationDialog extends StatelessWidget {
           ),
           child: Text(
             cancelButtonText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.grey,
+              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.white70,
               fontWeight: FontWeight.w600,
             ),
           ),

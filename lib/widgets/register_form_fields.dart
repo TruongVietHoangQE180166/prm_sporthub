@@ -58,7 +58,7 @@ class _RegisterFormFieldsState extends State<RegisterFormFields> {
           suffixIcon: IconButton(
             icon: Icon(
               _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey.shade400,
+              color: Theme.of(context).iconTheme.color?.withOpacity(0.5),
               size: 22,
             ),
             onPressed: () {
@@ -78,7 +78,7 @@ class _RegisterFormFieldsState extends State<RegisterFormFields> {
           suffixIcon: IconButton(
             icon: Icon(
               _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey.shade400,
+              color: Theme.of(context).iconTheme.color?.withOpacity(0.5),
               size: 22,
             ),
             onPressed: () {
@@ -105,10 +105,10 @@ class _RegisterFormFieldsState extends State<RegisterFormFields> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: Theme.of(context).inputDecorationTheme.fillColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).inputDecorationTheme.enabledBorder?.borderSide.color ?? Colors.grey.shade200,
               width: 1.5,
             ),
           ),
@@ -116,14 +116,14 @@ class _RegisterFormFieldsState extends State<RegisterFormFields> {
             controller: controller,
             obscureText: obscureText,
             keyboardType: keyboardType,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black87,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey.shade400,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
                 fontSize: 16,
               ),
               prefixIcon: Icon(

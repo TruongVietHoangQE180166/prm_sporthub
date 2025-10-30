@@ -31,11 +31,11 @@ class _ResetPasswordFormFieldsState extends State<ResetPasswordFormFields> {
     return Column(
       children: [
         // OTP input field
-        const Text(
+        Text(
           'Nhập mã OTP đã được gửi đến email của bạn',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -63,7 +63,7 @@ class _ResetPasswordFormFieldsState extends State<ResetPasswordFormFields> {
           suffixIcon: IconButton(
             icon: Icon(
               _isNewPasswordVisible ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey.shade400,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               size: 22,
             ),
             onPressed: () {
@@ -83,7 +83,7 @@ class _ResetPasswordFormFieldsState extends State<ResetPasswordFormFields> {
           suffixIcon: IconButton(
             icon: Icon(
               _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey.shade400,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               size: 22,
             ),
             onPressed: () {
@@ -110,10 +110,10 @@ class _ResetPasswordFormFieldsState extends State<ResetPasswordFormFields> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: Theme.of(context).colorScheme.outline,
               width: 1.5,
             ),
           ),
@@ -121,14 +121,14 @@ class _ResetPasswordFormFieldsState extends State<ResetPasswordFormFields> {
             controller: controller,
             obscureText: obscureText,
             keyboardType: keyboardType,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey.shade400,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 16,
               ),
               prefixIcon: Icon(

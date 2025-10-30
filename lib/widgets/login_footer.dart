@@ -19,7 +19,7 @@ class LoginFooter extends StatelessWidget {
           children: [
             Expanded(
               child: Divider(
-                color: Colors.grey.shade300,
+                color: Theme.of(context).dividerColor.withOpacity(0.3),
                 thickness: 1,
               ),
             ),
@@ -28,14 +28,14 @@ class LoginFooter extends StatelessWidget {
               child: Text(
                 'hoặc',
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                   fontSize: 14,
                 ),
               ),
             ),
             Expanded(
               child: Divider(
-                color: Colors.grey.shade300,
+                color: Theme.of(context).dividerColor.withOpacity(0.3),
                 thickness: 1,
               ),
             ),
@@ -43,7 +43,7 @@ class LoginFooter extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         // Google Sign In Button
-        _buildGoogleSignInButton(),
+        _buildGoogleSignInButton(context),
         const SizedBox(height: 24),
         // Register link
         Row(
@@ -52,7 +52,7 @@ class LoginFooter extends StatelessWidget {
             Text(
               'Chưa có tài khoản? ',
               style: TextStyle(
-                color: Colors.grey.shade700,
+                color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.8),
                 fontSize: 15,
               ),
             ),
@@ -73,19 +73,19 @@ class LoginFooter extends StatelessWidget {
     );
   }
 
-  Widget _buildGoogleSignInButton() {
+  Widget _buildGoogleSignInButton(BuildContext context) {
     return Container(
       height: 54,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: Theme.of(context).dividerColor.withOpacity(0.3),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: Theme.of(context).shadowColor.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -126,7 +126,7 @@ class LoginFooter extends StatelessWidget {
                 Text(
                   'Đăng nhập với Google',
                   style: TextStyle(
-                    color: Colors.grey.shade800,
+                    color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.9),
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
